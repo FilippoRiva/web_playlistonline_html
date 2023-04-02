@@ -9,25 +9,9 @@ import java.sql.SQLException;
 import java.util.UUID;
 
 public class UserDAO {
-    private final PreparedStatement checkCredentialsStatement;
-    private final PreparedStatement checkCookieStatement;
-    private final PreparedStatement addUserStatement;
-    private final PreparedStatement checkUserAvailableStatement;
-    private final PreparedStatement validCookieStatement;
+    private final Connection connection;
     public UserDAO(Connection connection) throws SQLException{
-        String checkCredentialsQuery="SELECT u_password,u_cookie FROM user WHERE u_name=?";
-        String userAddQuery = "INSERT INTO user(u_cookie,u_name,u_password) VALUES(?,?,?)";
-        String checkUserAvailableQuery = "SELECT COUNT(*) FROM user WHERE u_name=?";
-
-        String validCookieQuery = "SELECT COUNT(*) FROM user WHERE u_cookie=?";
-        String checkCookieQuery = "SELECT u_name,u_password FROM user WHERE u_cookie=?";
-
-        checkCredentialsStatement = connection.prepareStatement(checkCredentialsQuery);
-        addUserStatement = connection.prepareStatement(userAddQuery);
-        checkUserAvailableStatement= connection.prepareStatement(checkUserAvailableQuery);
-
-        validCookieStatement = connection.prepareStatement(validCookieQuery);
-        checkCookieStatement = connection.prepareStatement(checkCookieQuery);
+        this.connection = connection;
     }
 
     public String getNewCookie() throws SQLException{
@@ -35,6 +19,8 @@ public class UserDAO {
         String newCookieVal;
         boolean alreadyExists;
         do {
+            String validCookieQuery = "SELECT COUNT(*) FROM user WHERE u_cookie=?";
+            PreparedStatement validCookieStatement = connection.prepareStatement(validCookieQuery);
             //this generates Strings of length 32
             UUID randomUUID = UUID.randomUUID();
             newCookieVal = randomUUID.toString();
@@ -47,6 +33,8 @@ public class UserDAO {
     }
 
     public User checkCredentials(String username, String password) throws SQLException{
+        String checkCredentialsQuery="SELECT u_password,u_cookie FROM user WHERE u_name=?";
+        PreparedStatement checkCredentialsStatement = connection.prepareStatement(checkCredentialsQuery);
         ResultSet result;
         checkCredentialsStatement.setString(1,username);
         result = checkCredentialsStatement.executeQuery();
@@ -62,6 +50,8 @@ public class UserDAO {
     }
 
     public User checkCookie(String cookie) throws SQLException{
+        String checkCookieQuery = "SELECT u_name,u_password FROM user WHERE u_cookie=?";
+        PreparedStatement checkCookieStatement = connection.prepareStatement(checkCookieQuery);
         checkCookieStatement.setString(1, cookie);
         ResultSet result = checkCookieStatement.executeQuery();
         if(result.next()){
@@ -75,6 +65,8 @@ public class UserDAO {
     }
     
     public void addUser(String username,String password, String cookie) throws SQLException{
+        String userAddQuery = "INSERT INTO user(u_cookie,u_name,u_password) VALUES(?,?,?)";
+        PreparedStatement addUserStatement = connection.prepareStatement(userAddQuery);
         addUserStatement.setString(1,cookie);
         addUserStatement.setString(2,username);
         addUserStatement.setString(3,password);
@@ -82,6 +74,8 @@ public class UserDAO {
     }
 
     public boolean isUsernameAvailable(String username) throws SQLException{
+        String checkUserAvailableQuery = "SELECT COUNT(*) FROM user WHERE u_name=?";
+        PreparedStatement checkUserAvailableStatement= connection.prepareStatement(checkUserAvailableQuery);
         checkUserAvailableStatement.setString(1,username);
         ResultSet result = checkUserAvailableStatement.executeQuery();
         if(result.next()){

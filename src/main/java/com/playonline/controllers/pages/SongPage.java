@@ -23,18 +23,12 @@ public class SongPage extends HttpServlet {
     TemplateEngine templateEngine;
     JavaxServletWebApplication application;
     Connection connection;
-    SongDAO songDAO;
 
     @Override
     public void init() {
         this.templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
         this.application = JavaxServletWebApplication.buildApplication(getServletContext());
-        try {
-            this.connection = MySQLConnections.getConnection(getServletContext());
-            this.songDAO = new SongDAO(connection,getInitParameter("filesDirectory"));
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        this.connection = MySQLConnections.getConnection(getServletContext());
     }
 
     @Override
@@ -58,7 +52,7 @@ public class SongPage extends HttpServlet {
         // page templating
         Song song;
         try {
-            song = songDAO.getSongByID(id, user.getUsername());
+            song = new SongDAO(connection,getInitParameter("filesDirectory")).getSongByID(id, user.getUsername());
         } catch (SQLException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;

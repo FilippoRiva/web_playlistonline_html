@@ -10,33 +10,21 @@ import javax.servlet.http.Part;
 import java.io.File;
 import java.io.IOException;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
 
 public class SongDAO {
 
-    PreparedStatement getSongByIDStatement;
-    PreparedStatement addSongStatement;
-    PreparedStatement checkSongOwnershipStatement;
-    String folder;
+    private final String folder;
+    private final Connection connection;
     public SongDAO(Connection connection, String folder) throws SQLException {
         this.folder = folder;
-        String getSongByIDQuery =
-                "SELECT s_ID, s_title, s_genre, a_ID, a_name, a_date, ar_ID ,ar_name " +
-                "FROM song " +
-                "JOIN album a on a.a_ID = song.s_album_ID " +
-                "JOIN artist a2 on a2.ar_ID = a.a_artist_ID " +
-                "WHERE s_ID=? and s_owner=? ";
-        String addSongQuery =
-                "INSERT INTO song (s_title, s_album_ID, s_genre, s_owner) VALUES (?,?,?,?)";
-        String checkSongOwnershipQuery = "SELECT COUNT(*) FROM song WHERE s_ID = ? AND s_owner = ?";
-        getSongByIDStatement = connection.prepareStatement(getSongByIDQuery);
-        addSongStatement = connection.prepareStatement(addSongQuery,Statement.RETURN_GENERATED_KEYS);
-        checkSongOwnershipStatement = connection.prepareStatement(checkSongOwnershipQuery);
+        this.connection = connection;
     }
 
 
     public void addSong(String owner, String title, GenreEnum genre, Part song, Album album) throws SQLException{
+        String addSongQuery =
+                "INSERT INTO song (s_title, s_album_ID, s_genre, s_owner) VALUES (?,?,?,?)";
+        PreparedStatement addSongStatement = connection.prepareStatement(addSongQuery,Statement.RETURN_GENERATED_KEYS);
         addSongStatement.setString(1,title);
         addSongStatement.setInt(2,album.getId());
         addSongStatement.setString(3, genre.name());
@@ -61,6 +49,13 @@ public class SongDAO {
 
 
     public Song getSongByID(int id, String username) throws SQLException {
+        String getSongByIDQuery =
+                "SELECT s_ID, s_title, s_genre, a_ID, a_name, a_date, ar_ID ,ar_name " +
+                        "FROM song " +
+                        "JOIN album a on a.a_ID = song.s_album_ID " +
+                        "JOIN artist a2 on a2.ar_ID = a.a_artist_ID " +
+                        "WHERE s_ID=? and s_owner=? ";
+        PreparedStatement getSongByIDStatement = connection.prepareStatement(getSongByIDQuery);
         getSongByIDStatement.setInt(1,id);
         getSongByIDStatement.setString(2,username);
         ResultSet result = getSongByIDStatement.executeQuery();
@@ -84,6 +79,8 @@ public class SongDAO {
     }
 
     public boolean isOwner(String username, int id) throws SQLException {
+        String checkSongOwnershipQuery = "SELECT COUNT(*) FROM song WHERE s_ID = ? AND s_owner = ?";
+        PreparedStatement checkSongOwnershipStatement = connection.prepareStatement(checkSongOwnershipQuery);
         checkSongOwnershipStatement.setInt(1,id);
         checkSongOwnershipStatement.setString(2,username);
         ResultSet result = checkSongOwnershipStatement.executeQuery();

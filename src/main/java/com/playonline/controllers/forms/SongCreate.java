@@ -30,21 +30,16 @@ import java.util.Date;
 public class SongCreate extends HttpServlet {
 
     Connection connection;
-    SongDAO songDAO;
-    AlbumDAO albumDAO;
-    ArtistDAO artistDAO;
     RequestDispatcher homeATrue;
     RequestDispatcher homeAFalse;
+    String filesDirectory;
 
     @Override
     public void init(){
         this.connection = MySQLConnections.getConnection(getServletContext());
-        String filesDirectory = getServletContext().getInitParameter("filesDirectory");
+        this.filesDirectory = getServletContext().getInitParameter("filesDirectory");
         try {
             connection.setAutoCommit(false);
-            artistDAO = new ArtistDAO(connection);
-            songDAO = new SongDAO(connection,filesDirectory);
-            albumDAO = new AlbumDAO(connection,filesDirectory);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -118,13 +113,14 @@ public class SongCreate extends HttpServlet {
         Album album = null;
         Artist artist;
         try {
+            AlbumDAO albumDAO = new AlbumDAO(connection,filesDirectory);
             if(a_ID_str==null) {
-                artist = artistDAO.addArtist(user.getUsername(),ar_name);
+                artist = new ArtistDAO(connection).addArtist(user.getUsername(),ar_name);
                 album = albumDAO.addAlbum(a_name, artist, a_date, cover, user.getUsername());
             } else {
-                album = albumDAO.getAlbum(a_ID);
+                album = albumDAO.getAlbum(user.getUsername(),a_ID);
             }
-            songDAO.addSong(user.getUsername(), s_title,genre, song, album);
+            new SongDAO(connection,filesDirectory).addSong(user.getUsername(), s_title,genre, song, album);
             connection.commit();
         } catch (InvalidParameterException e){
             try {
@@ -138,7 +134,7 @@ public class SongCreate extends HttpServlet {
             try {
                 connection.rollback();
                 //cover deletion when song query or song file save fails
-                albumDAO.deleteAlbumCover(user.getUsername(),album);
+                new AlbumDAO(connection,filesDirectory).deleteAlbumCover(user.getUsername(),album);
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }

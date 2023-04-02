@@ -19,7 +19,6 @@ import java.util.Map;
 @WebServlet("/playlist-create")
 public class PlaylistCreate extends HttpServlet {
     PlaylistDAO playlistDAO;
-    SongDAO songDAO;
     Connection connection;
     RequestDispatcher homeDispatcher;
     @Override
@@ -29,7 +28,6 @@ public class PlaylistCreate extends HttpServlet {
             this.connection = MySQLConnections.getConnection(getServletContext());
             connection.setAutoCommit(false);
             this.playlistDAO = new PlaylistDAO(connection);
-            this.songDAO = new SongDAO(connection,""); //no need to upload files here
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -59,7 +57,7 @@ public class PlaylistCreate extends HttpServlet {
                 for (String s_ID : songIDs) {
                     try {
                         int id = Integer.parseInt(s_ID);
-                        if(songDAO.isOwner(user.getUsername(),id)) playlistDAO.addSongToPlaylist(p_ID, id);
+                        if(new SongDAO(connection,"").isOwner(user.getUsername(),id)) playlistDAO.addSongToPlaylist(p_ID, id);
                     } catch (NumberFormatException ignored) { // ignoring non parsable IDs
                     }
                 }

@@ -18,17 +18,10 @@ import java.util.Map;
 @WebServlet("/playlist-add")
 public class PlaylistAdd extends HttpServlet {
 
-    PlaylistDAO playlistDAO;
-    SongDAO songDAO;
+    Connection connection;
     @Override
     public void init() throws ServletException {
-        try {
-            Connection connection = MySQLConnections.getConnection(getServletContext());
-            playlistDAO = new PlaylistDAO(connection);
-            songDAO = new SongDAO(connection, "");
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        this.connection = MySQLConnections.getConnection(getServletContext());
     }
 
     @Override
@@ -63,7 +56,7 @@ public class PlaylistAdd extends HttpServlet {
             for (String s_ID : songIDs) {
                 try {
                     int id = Integer.parseInt(s_ID);
-                    if(songDAO.isOwner(user.getUsername(),id))playlistDAO.addSongToPlaylist(p_ID, id);
+                    if(new SongDAO(connection,"").isOwner(user.getUsername(),id))new PlaylistDAO(connection).addSongToPlaylist(p_ID, id);
                 } catch (NumberFormatException ignored) { //ignoring non parsable IDs
                 }
             }

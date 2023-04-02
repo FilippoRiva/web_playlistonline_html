@@ -21,18 +21,12 @@ public class UserRegistration extends HttpServlet {
 
     TemplateEngine templateEngine;
     JavaxServletWebApplication application;
-    private UserDAO userDAO;
-
+    Connection connection;
     @Override
     public void init() {
         templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
         application = JavaxServletWebApplication.buildApplication(getServletContext());
-        Connection connection = MySQLConnections.getConnection(getServletContext());
-        try {
-            userDAO = new UserDAO(connection);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        this.connection = MySQLConnections.getConnection(getServletContext());
     }
 
     @Override
@@ -71,7 +65,7 @@ public class UserRegistration extends HttpServlet {
         // registration attempt
         String cookieVal;
         try {
-            if(!userDAO.isUsernameAvailable(username)){
+            if(!new UserDAO(connection).isUsernameAvailable(username)){
                 req.setAttribute("username",username);
                 req.setAttribute("password",password);
                 req.setAttribute("passwordCopy",passwordCopy);
@@ -79,6 +73,7 @@ public class UserRegistration extends HttpServlet {
                 templateEngine.process("registration",context,resp.getWriter());
                 return;
             } else {
+                UserDAO userDAO = new UserDAO(connection);
                 cookieVal = userDAO.getNewCookie();
                 userDAO.addUser(username,password,cookieVal);
             }

@@ -4,7 +4,6 @@ import com.playonline.beans.Playlist;
 import com.playonline.beans.User;
 import com.playonline.dao.AlbumDAO;
 import com.playonline.dao.PlaylistDAO;
-import com.playonline.dao.SongDAO;
 import com.playonline.utils.GenreEnum;
 import com.playonline.utils.MySQLConnections;
 import com.playonline.utils.TemplateEngines;
@@ -30,23 +29,15 @@ import java.util.Objects;
 public class HomePage extends HttpServlet {
     TemplateEngine templateEngine;
     JavaxServletWebApplication application;
-    PlaylistDAO playlistDAO;
-    AlbumDAO albumDAO;
-    SongDAO songDAO;
+    String filesDirectory;
+    Connection connection;
 
     @Override
     public void init() {
         this.templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
         this.application = JavaxServletWebApplication.buildApplication(getServletContext());
-        try{
-            Connection connection = MySQLConnections.getConnection(getServletContext());
-            String filesDirectory = getServletContext().getInitParameter("filesDirectory");
-            this.playlistDAO = new PlaylistDAO(connection);
-            this.albumDAO = new AlbumDAO(connection, filesDirectory);
-            this.songDAO = new SongDAO(connection, filesDirectory);
-        } catch (SQLException e){
-            throw new RuntimeException(e);
-        }
+        this.connection = MySQLConnections.getConnection(getServletContext());
+        this.filesDirectory = getServletContext().getInitParameter("filesDirectory");
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
@@ -80,7 +71,7 @@ public class HomePage extends HttpServlet {
         // getting user playlist
         List<Playlist> playlists;
         try {
-            playlists = playlistDAO.getUserPlaylists(user.getUsername());
+            playlists = new PlaylistDAO(connection).getUserPlaylists(user.getUsername());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -100,7 +91,7 @@ public class HomePage extends HttpServlet {
             else {
                 context.setVariable("newAlbum",false);
                 try {
-                    context.setVariable("albums",albumDAO.getUserAlbums(user.getUsername()));
+                    context.setVariable("albums",new AlbumDAO(connection,filesDirectory).getUserAlbums(user.getUsername()));
                 } catch (SQLException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     return;
@@ -108,7 +99,7 @@ public class HomePage extends HttpServlet {
             }
         }
         try {
-            context.setVariable("artists",playlistDAO.getArtists(user.getUsername()));
+            context.setVariable("artists",new PlaylistDAO(connection).getArtists(user.getUsername()));
         } catch (SQLException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;

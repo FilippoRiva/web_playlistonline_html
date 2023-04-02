@@ -25,17 +25,11 @@ public class PlaylistPage extends HttpServlet {
     TemplateEngine templateEngine;
     JavaxServletWebApplication application;
     Connection connection;
-    PlaylistDAO playlistDAO;
     @Override
     public void init(){
         this.templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
         this.application = JavaxServletWebApplication.buildApplication(getServletContext());
-        try {
-            this.connection = MySQLConnections.getConnection(getServletContext());
-            this.playlistDAO = new PlaylistDAO(connection);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
+        this.connection = MySQLConnections.getConnection(getServletContext());
     }
 
     @Override
@@ -70,6 +64,7 @@ public class PlaylistPage extends HttpServlet {
         boolean hasNext = false;
         boolean empty = false;
         try {
+            PlaylistDAO playlistDAO = new PlaylistDAO(connection);
             playlist = playlistDAO.getPlaylistPage(p_ID, user.getUsername(), page);
             if(playlist==null){
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
