@@ -1,0 +1,26 @@
+package com.playonline.controllers;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/logout")
+public class UserLogout extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        doPost(req,resp);
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        Cookie cookie = new Cookie("LOGIN_INFO","0");
+        cookie.setMaxAge(0);
+        resp.addCookie(cookie);
+        req.getSession(false).setAttribute("user",null);
+        resp.sendRedirect("/PlaylistOnline/login");
+    }
+}

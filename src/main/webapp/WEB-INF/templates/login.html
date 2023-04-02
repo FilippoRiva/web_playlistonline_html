@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>PlaylistOnline</title>
+</head>
+<body>
+
+<h1>Login</h1>
+<form action = "/PlaylistOnline/login" method = "post">
+    <label for="username" >Username:</label><br>
+    <input type="text" id="username" name="username" th:value="${username}"><br>
+    <label for="password">Password:</label><br>
+    <input type="password" id="password" name="password"><br>
+    <input type="submit" value="Sign in"><br>
+</form>
+<span th:text="${invalid} ? 'Invalid Credentials':''"></span>
+</body>
+<br>
+<br>
+<a href="registration">register</a>
+</html>
