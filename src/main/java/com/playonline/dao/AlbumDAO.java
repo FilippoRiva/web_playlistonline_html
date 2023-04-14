@@ -1,0 +1,101 @@
+package com.playonline.dao;
+
+import com.playonline.beans.Album;
+import com.playonline.beans.Artist;
+
+import javax.servlet.http.Part;
+import java.io.File;
+import java.io.IOException;
+import java.security.InvalidParameterException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+
+public class AlbumDAO {
+    PreparedStatement addAlbumStatement;
+    PreparedStatement getAlbumByIDStatement;
+    String folder;
+    public AlbumDAO(Connection connection, String folder) throws SQLException{
+        this.folder = folder;
+        String addAlbumQuery = "INSERT INTO album(a_name,a_artist_ID,a_date) VALUES (?,?,?)";
+        String getAlbumByIDQuery = "SELECT * FROM album JOIN artist ON a_artist_ID=a_ID WHERE a_ID=?";
+        addAlbumStatement = connection.prepareStatement(addAlbumQuery, Statement.RETURN_GENERATED_KEYS);
+        getAlbumByIDStatement = connection.prepareStatement(getAlbumByIDQuery);
+    }
+
+    public List<Album> getUserAlbums(String username){
+        return new ArrayList<>();
+    }
+
+    public Album getAlbum(int albumID) throws SQLException, InvalidParameterException{
+        getAlbumByIDStatement.setInt(1,albumID);
+        ResultSet result = getAlbumByIDStatement.executeQuery();
+        if(!result.next()) {
+            throw new InvalidParameterException();
+        };
+        // java bean creation
+        Album album = new Album();
+        album.setName(result.getString("a_name"));
+        Artist artist = new Artist();
+        artist.setName(result.getString("ar_name"));
+        album.setArtist(artist);
+        album.setDate(new Date(result.getDate("a_date").getTime()));
+        album.setId(albumID);
+        return album;
+    }
+
+    public Album addAlbum(String albumName, Artist artist, Date date, Part cover,String username) throws SQLException{
+        // db insert
+        addAlbumStatement.setString(1,albumName);
+        addAlbumStatement.setInt(2,artist.getID());
+        addAlbumStatement.setDate(3,new java.sql.Date(date.getTime()));
+        addAlbumStatement.executeUpdate();
+        ResultSet keys = addAlbumStatement.getGeneratedKeys();
+        keys.next();
+        int currentID = keys.getInt(1);
+        // path generation
+        String filename = cover.getSubmittedFileName();
+        String extension = filename.substring(filename.lastIndexOf("."));
+        String dir = folder+username+"/"+artist.getID()+"/"+currentID+"/";
+        String filePath = dir+"cover"+extension;
+        // saving cover image
+        try {
+            File f = new File(dir);
+            if(!f.exists() && !f.mkdirs()){
+                throw new SQLException("unable to create dirs");
+            }
+            f = new File(filePath);
+            cover.write(f.getAbsolutePath());
+        } catch (IOException e) {
+            throw new SQLException(e);
+        }
+        // java bean creation
+        Album album = new Album();
+        album.setName(albumName);
+        album.setArtist(artist);
+        album.setDate(date);
+        album.setId(currentID);
+        return album;
+    }
+
+    public boolean deleteAlbumCover(String username, Album album) {
+        if(album==null){
+            return false;
+        }
+        int artistID = album.getArtist().getID();
+        int albumID = album.getId();
+        String dir = folder+username+"/"+artistID+"/"+albumID+"/";
+        File f = new File(dir);
+        File[] files = f.listFiles();
+        if(files == null || files.length<=1) return f.delete();
+        else {
+            for(File file : files){
+                if(file.getName().substring(0,file.getName().lastIndexOf(".")-1).equals("cover")){
+                    return file.delete();
+                }
+            }
+        }
+        return false;
+    }
+}

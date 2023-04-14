@@ -23,5 +23,13 @@
     <param-name>dbDriver</param-name>
     <param-value>com.mysql.cj.jdbc.Driver</param-value>
   </context-param>
+  <context-param>
+    <param-name>filesDirectory</param-name>
+    <param-value>/home/phil/playlistOnline/files/</param-value>
+  </context-param>
+  
+  <welcome-file-list>
+    <welcome-file>login</welcome-file>
+  </welcome-file-list>
 
 </web-app>
