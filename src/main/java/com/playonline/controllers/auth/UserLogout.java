@@ -1,4 +1,4 @@
-package com.playonline.controllers;
+package com.playonline.controllers.auth;
 
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;

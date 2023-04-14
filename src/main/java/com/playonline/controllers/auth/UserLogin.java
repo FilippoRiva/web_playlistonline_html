@@ -1,4 +1,4 @@
-package com.playonline.controllers;
+package com.playonline.controllers.auth;
 
 import com.playonline.beans.User;
 import com.playonline.dao.UserDAO;
@@ -35,26 +35,35 @@ public class UserLogin extends HttpServlet{
         this.application = JavaxServletWebApplication.buildApplication(getServletContext());
 
         Connection connection = MySQLConnections.getConnection(context);
-        userDAO = new UserDAO(connection);
+        try {
+            userDAO = new UserDAO(connection);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
 
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         Cookie[] cookies = req.getCookies();
         if(cookies==null) {
-            loginRedirect(req,resp,true);
+            loginProcess(req,resp,true);
             return;
         }
         for (Cookie c : cookies) {
             if (c.getName().equals("LOGIN_INFO")) {
-                User user = userDAO.checkCookie(c.getValue());
+                User user = null;
+                try {
+                    user = userDAO.checkCookie(c.getValue());
+                } catch (SQLException e) {
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                }
                 if(user == null) break;
                 req.getSession(true).setAttribute("user", user);
                 resp.sendRedirect("/PlaylistOnline/home");
                 return;
             }
         }
-        loginRedirect(req,resp,true);
+        loginProcess(req,resp,true);
     }
 
     @Override
@@ -62,14 +71,17 @@ public class UserLogin extends HttpServlet{
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         if(username==null || password==null || password.length()<5){
-            req.setAttribute("username",username);
-            loginRedirect(req,resp,false);
+            loginProcess(req,resp,false);
             return;
         }
-        User user = userDAO.checkCredentials(username,password);
+        User user = null;
+        try {
+            user = userDAO.checkCredentials(username,password);
+        } catch (SQLException e) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+        }
         if(user==null){
-            req.setAttribute("username",username);
-            loginRedirect(req,resp,false);
+            loginProcess(req,resp,false);
             return;
         }
         req.getSession(true).setAttribute("user",user);
@@ -79,9 +91,9 @@ public class UserLogin extends HttpServlet{
         resp.sendRedirect("/PlaylistOnline/home");
     }
 
-    public void loginRedirect(HttpServletRequest req, HttpServletResponse resp,boolean valid) throws IOException {
-        req.setAttribute("invalid",!valid);
-        IWebContext ctx = new WebContext(application.buildExchange(req,resp));
+    public void loginProcess(HttpServletRequest req, HttpServletResponse resp, boolean valid) throws IOException {
+        WebContext ctx = new WebContext(application.buildExchange(req,resp));
+        ctx.setVariable("invalid",!valid);
         templateEngine.process("login",ctx,resp.getWriter());
     }
 }
