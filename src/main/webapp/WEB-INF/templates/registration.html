@@ -8,13 +8,13 @@
 <body>
 
 <h1>Registration</h1>
-<form action = "/PlaylistOnline/registration" method = "post">
+<form action = "/PlaylistOnline/registration" method = "post" autocomplete="off">
     <label for="username">Username:</label><br>
-    <input type="text" id="username" name="username" th:value="${username}"><br>
+    <input type="text" id="username" name="username" th:value="${param.username}"><br>
     <label for="password">Password (5 characters minimum):</label><br>
-    <input type="password" id="password" name="password" th:value="${password}"><br>
+    <input type="password" id="password" name="password" th:value="${param.password}"><br>
     <label for="passwordCopy">Confirm Password:</label><br>
-    <input type="password" id="passwordCopy" name="passwordCopy" th:value="${passwordCopy}"><br>
+    <input type="password" id="passwordCopy" name="passwordCopy" th:value="${param.passwordCopy}"><br>
     <input type="submit" value="Register"><br>
 </form>
 <span th:text="${usernameInvalid} ? 'invalid username' : ''"></span>

@@ -5,12 +5,105 @@
     <title>PlaylistOnline</title>
 </head>
 <body>
-     <span th:text="${session.user.username}">no_name</span>
-
+    User : <span th:text="${session.user.username}">no_name</span>
     <br>
-    <br>
-    <form action = "/PlaylistOnline/logout" method = "post">
+    <form th:align="left" action = "/PlaylistOnline/logout" method = "post">
         <input type="submit" value="Logout"><br>
     </form>
+
+    <h1>Playlists</h1>
+
+    <table border="1" cellpadding="10" >
+        <thead>
+            <th></th>
+            <th>Creation date</th>
+        </thead>
+        <tbody>
+        <tr th:each="playlist :${playlists}">
+            <td>
+               <a href="/playlist?id=1" th:text="${playlist.name}"
+                  th:href="@{/playlist(id=${playlist.id},page=1)}">
+                   Playlist 1
+               </a>
+            </td>
+            <td th:text="${playlist.date}">0/00/0001</td>
+        </tr>
+        </tbody>
+    </table>
+    <br>
+
+    <hr>
+
+    <h1>Add a new song to your songs</h1>
+
+    <form action = "/PlaylistOnline/song-add" method = "post" autocomplete="off"  enctype="multipart/form-data">
+        <label for="s_title" >Title :</label>
+        <input type="text" id="s_title" name="s_title" th:value="${param.s_title}" th:autofocus="${!adding}"><br>
+
+        <label for="s_genre" >Genre :</label>
+        <select id="s_genre" name="s_genre">
+            <option th:value="none">choose an option</option>
+            <option th:each="genre : ${genres}"
+                     th:value="${genre.name}"
+                     th:text="${genre.name}"
+                     th:selected="${selectedId} == ${genre.id}">
+            </option>
+        </select><br>
+
+        <button type="submit" formaction="/PlaylistOnline/home?a=true">New Album</button>
+
+        <button type="submit" formaction="/PlaylistOnline/home?a=false">Existing Album</button>
+
+        <div th:if="${adding&&newAlbum}">
+            <label for="ar_name">Artist : </label>
+            <input type="text" id="ar_name" name="ar_name" th:value="${param.ar_name}" th:autofocus="${newAlbum}"><br>
+            <label for="a_name">Album Title : </label>
+            <input type="text" id="a_name" name="a_name" th:value="${param.a_name}"><br>
+            <label for="a_date">Release Date : </label>
+            <input type="date" id="a_date" name="a_date" th:value="${param.a_date}"><br>
+            <label for="a_cover">Cover :</label>
+            <input type="file"
+                   id="a_cover"
+                   name="a_cover"
+                   th:value="${param.a_cover}"
+                   accept="image/*">
+        </div>
+
+        <div th:if="${adding&&!newAlbum&&albums.size!=0}">
+            <label for="a_ID">Album :</label>
+            <select id="a_ID" name="a_ID" th:value="${param.s_album}">
+                <option th:each="album : ${albums}"
+                        th:value="${album.id}"
+                        value="1">Album 1</option>
+            </select><br>
+        </div>
+
+        <span th:if="${adding&&!newAlbum&&albums.size==0}">
+            <br>No albums available<br>
+        </span>
+
+        <div th:if="${adding}">
+            <label for="s_file">Audio File :</label>
+            <input type="file" id="s_file" name="s_file"
+
+
+
+                   th:value="${param.s_file}" accept="audio/*"><br>
+            <button type="submit">Add</button>
+        </div>
+
+    </form>
+
+    <hr>
+
+    <h1>Create a new Playlist</h1>
+    <form action = "/PlaylistOnline/create-playlist" method = "post" autocomplete="off">
+        <label for="p_title" >Playlist Title:</label><br>
+        <input type="text" id="p_title" name="p_title"><br>
+        <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
+        <label for="vehicle1"> I have a bike</label><br>
+        <input type="submit" value="Create"><br>
+    </form>
+
 </body>
 </html>
