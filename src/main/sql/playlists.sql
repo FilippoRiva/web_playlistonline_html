@@ -1,0 +1,1 @@
+SELECT * FROM playlist WHERE p_owner = 'pippo'
