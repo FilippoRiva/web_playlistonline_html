@@ -1,3 +1,4 @@
-SELECT s_title,s_genre,a_name,ar_name
+SELECT s_title,s_genre,a_name,ar_name, s_ID, a_ID, ar_ID
 FROM user JOIN song JOIN album JOIN artist
-WHERE user.u_name='pippo' AND u_name=song.s_owner AND s_album_ID=album.a_ID AND a_artist_ID=artist.ar_ID
+WHERE user.u_name='pippo' AND u_name=song.s_owner
+  AND s_album_ID=album.a_ID AND a_artist_ID=artist.ar_ID
