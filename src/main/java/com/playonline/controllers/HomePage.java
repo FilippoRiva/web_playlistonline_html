@@ -4,6 +4,7 @@ import com.playonline.beans.Playlist;
 import com.playonline.beans.User;
 import com.playonline.dao.AlbumDAO;
 import com.playonline.dao.PlaylistDAO;
+import com.playonline.dao.SongDAO;
 import com.playonline.utils.GenreEnum;
 import com.playonline.utils.MySQLConnections;
 import com.playonline.utils.TemplateEngines;
@@ -30,6 +31,7 @@ public class HomePage extends HttpServlet {
     JavaxServletWebApplication application;
     PlaylistDAO playlistDAO;
     AlbumDAO albumDAO;
+    SongDAO songDAO;
 
     @Override
     public void init() {
@@ -38,6 +40,8 @@ public class HomePage extends HttpServlet {
         try{
             this.playlistDAO = new PlaylistDAO(MySQLConnections.getConnection(getServletContext()));
             this.albumDAO = new AlbumDAO(MySQLConnections.getConnection(getServletContext()),
+                    getServletContext().getInitParameter("filesDirectory"));
+            this.songDAO = new SongDAO(MySQLConnections.getConnection(getServletContext()),
                     getServletContext().getInitParameter("filesDirectory"));
         } catch (SQLException e){
             throw new RuntimeException(e);
@@ -95,6 +99,12 @@ public class HomePage extends HttpServlet {
                     return;
                 }
             }
+        }
+        try {
+            context.setVariable("artists",songDAO.getArtists(user.getUsername()));
+        } catch (SQLException e) {
+            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
         context.setVariable("selectedId",selectedId);
         templateEngine.process("home",context,resp.getWriter());

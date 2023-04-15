@@ -1,12 +1,14 @@
 package com.playonline.beans;
 
 import java.util.Date;
+import java.util.List;
 
 public class Album {
     int id;
     String name;
     Artist artist;
     Date date;
+    List<Song> songs;
     public int getId() {
         return id;
     }
@@ -39,4 +41,11 @@ public class Album {
         this.date = date;
     }
 
+    public List<Song> getSongs() {
+        return songs;
+    }
+
+    public void setSongs(List<Song> songs) {
+        this.songs = songs;
+    }
 }

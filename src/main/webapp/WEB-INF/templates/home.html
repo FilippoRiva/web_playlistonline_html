@@ -99,10 +99,39 @@
 
     <h1>Create a new Playlist</h1>
     <form action = "/PlaylistOnline/create-playlist" method = "post" autocomplete="off">
-        <label for="p_title" >Playlist Title:</label><br>
+        <label for="p_title" >Playlist Title:</label>
         <input type="text" id="p_title" name="p_title"><br>
-        <input type="checkbox" id="vehicle1" name="vehicle1" value="Bike">
-        <label for="vehicle1"> I have a bike</label><br>
+        <br>
+        <span>
+            Pick the songs you want to add : <br>
+        </span>
+        <span th:if="${artists.size()==0}">
+            You have no songs uploaded<br>
+        </span>
+        <table th:if="${artists.size()!=0}" border="1">
+            <th>Artist</th>
+            <th></th>
+            <tr th:each="artist : ${artists}">
+                <td th:text="${artist.name}">artist name</td>
+                <td>
+                    <table border="1">
+                        <tr th:each="album : ${artist.albums}">
+                            <td th:text="${album.name}">album</td>
+                            <td>
+                                <table border="1">
+                                    <tr th:each="song : ${album.songs}">
+                                        <td th:text="${song.title}"> song title</td>
+                                        <td>
+                                            <input type="checkbox" th:value="${song.id}">
+                                        </td>
+                                    </tr>
+                                </table>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+        </table>
         <input type="submit" value="Create"><br>
     </form>
 

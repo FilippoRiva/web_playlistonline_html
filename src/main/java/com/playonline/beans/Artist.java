@@ -1,8 +1,11 @@
 package com.playonline.beans;
 
+import java.util.List;
+
 public class Artist {
     String name;
     int ID;
+    List<Album> albums;
 
     public int getID() {
         return ID;
@@ -18,5 +21,13 @@ public class Artist {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public List<Album> getAlbums() {
+        return albums;
+    }
+
+    public void setAlbums(List<Album> albums) {
+        this.albums = albums;
     }
 }
