@@ -8,7 +8,6 @@ import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.web.servlet.JavaxServletWebApplication;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -25,7 +24,7 @@ public class UserRegistration extends HttpServlet {
     private UserDAO userDAO;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
         application = JavaxServletWebApplication.buildApplication(getServletContext());
         Connection connection = MySQLConnections.getConnection(getServletContext());
@@ -37,13 +36,13 @@ public class UserRegistration extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         IWebContext context = new WebContext(application.buildExchange(req,resp));
         templateEngine.process("registration",context,resp.getWriter());
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         String passwordCopy = req.getParameter("passwordCopy");

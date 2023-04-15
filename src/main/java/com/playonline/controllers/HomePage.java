@@ -12,19 +12,14 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.web.IWebExchange;
 import org.thymeleaf.web.servlet.JavaxServletWebApplication;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.Part;
 import java.io.IOException;
 import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 
 
@@ -37,7 +32,7 @@ public class HomePage extends HttpServlet {
     AlbumDAO albumDAO;
 
     @Override
-    public void init() throws ServletException {
+    public void init() {
         this.templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
         this.application = JavaxServletWebApplication.buildApplication(getServletContext());
         try{
@@ -49,7 +44,7 @@ public class HomePage extends HttpServlet {
         }
     }
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         User user = (User) req.getSession().getAttribute("user");
         if(user == null) {
             resp.sendRedirect("/PlaylistOnline/login");
@@ -64,18 +59,7 @@ public class HomePage extends HttpServlet {
             }
         }
         //keeping form input
-        String s_title = req.getParameter("s_title");
         String s_genre = req.getParameter("s_genre");
-        String a_name = req.getParameter("a_name");
-        String a_artist_name = req.getParameter("a_artist_name");
-        String a_date_str = req.getParameter("a_date");
-        java.util.Date a_date = null;
-        if(a_date_str!=null) {
-            try {
-                a_date = new SimpleDateFormat("yyyy-MM-dd").parse(a_date_str);
-            } catch (ParseException ignored) {
-            }
-        }
         int selectedId=0;
         if(s_genre!=null){
             for(GenreEnum g : GenreEnum.values()){
@@ -85,12 +69,7 @@ public class HomePage extends HttpServlet {
             }
         }
 
-
-
-
-
-
-        List<Playlist> playlists = null;
+        List<Playlist> playlists;
         try {
             playlists = playlistDAO.getUserPlaylists(user.getUsername());
         } catch (SQLException e) {
@@ -123,7 +102,7 @@ public class HomePage extends HttpServlet {
 
     //New Album selector
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String att = req.getParameter("a");
         if(att!=null) {
             boolean addingNewAlbum;

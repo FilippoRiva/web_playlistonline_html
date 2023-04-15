@@ -54,7 +54,7 @@ public class AlbumDAO {
         ResultSet result = getAlbumByIDStatement.executeQuery();
         if(!result.next()) {
             throw new InvalidParameterException();
-        };
+        }
         // java bean creation
         Album album = new Album();
         album.setName(result.getString("a_name"));
@@ -101,23 +101,24 @@ public class AlbumDAO {
         return album;
     }
 
-    public boolean deleteAlbumCover(String username, Album album) {
+    public void deleteAlbumCover(String username, Album album) {
         if(album==null){
-            return false;
+            return;
         }
         int artistID = album.getArtist().getID();
         int albumID = album.getId();
         String dir = folder+username+"/"+artistID+"/"+albumID+"/";
         File f = new File(dir);
         File[] files = f.listFiles();
-        if(files == null || files.length<=1) return f.delete();
-        else {
+        if(files == null || files.length<=1) {
+            f.delete();
+        } else {
             for(File file : files){
                 if(file.getName().substring(0,file.getName().lastIndexOf(".")-1).equals("cover")){
-                    return file.delete();
+                    file.delete();
+                    return;
                 }
             }
         }
-        return false;
     }
 }

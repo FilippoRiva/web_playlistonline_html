@@ -38,7 +38,7 @@ public class SongAdd extends HttpServlet {
     RequestDispatcher homeAFalse;
 
     @Override
-    public void init() throws ServletException {
+    public void init(){
         this.connection = MySQLConnections.getConnection(getServletContext());
         String filesDirectory = getServletContext().getInitParameter("filesDirectory");
         try {
@@ -150,6 +150,7 @@ public class SongAdd extends HttpServlet {
             else homeAFalse.forward(req,resp);
         }
         //success
+        assert album != null;
         resp.sendRedirect("home?a=false&s="+album.getId());
     }
 }

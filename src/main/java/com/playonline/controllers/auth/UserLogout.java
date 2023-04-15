@@ -1,6 +1,5 @@
 package com.playonline.controllers.auth;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -11,12 +10,12 @@ import java.io.IOException;
 @WebServlet("/logout")
 public class UserLogout extends HttpServlet {
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         doPost(req,resp);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Cookie cookie = new Cookie("LOGIN_INFO","0");
         cookie.setMaxAge(0);
         resp.addCookie(cookie);

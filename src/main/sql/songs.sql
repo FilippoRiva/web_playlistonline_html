@@ -1,4 +1,6 @@
-SELECT s_title,s_genre,a_name,ar_name, s_ID, a_ID, ar_ID
-FROM user JOIN song JOIN album JOIN artist
-WHERE user.u_name='pippo' AND u_name=song.s_owner
-  AND s_album_ID=album.a_ID AND a_artist_ID=artist.ar_ID
+SELECT ar_name, ar_ID, a_name, a_date, a_ID, s_title, s_ID
+FROM artist
+         JOIN album a on artist.ar_ID = a.a_artist_ID
+         JOIN song s on a.a_ID = s.s_album_ID
+WHERE s_owner= ?
+ORDER BY ar_name, a_name, s_title

@@ -5,12 +5,10 @@ import com.playonline.dao.UserDAO;
 import com.playonline.utils.MySQLConnections;
 import com.playonline.utils.TemplateEngines;
 import org.thymeleaf.TemplateEngine;
-import org.thymeleaf.context.IWebContext;
 import org.thymeleaf.context.WebContext;
 import org.thymeleaf.web.servlet.JavaxServletWebApplication;
 
 import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -28,7 +26,7 @@ public class UserLogin extends HttpServlet{
     private JavaxServletWebApplication application;
 
     @Override
-    public void init() throws ServletException {
+    public void init(){
         ServletContext context = getServletContext();
 
         this.templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
@@ -43,7 +41,7 @@ public class UserLogin extends HttpServlet{
 
     }
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         Cookie[] cookies = req.getCookies();
         if(cookies==null) {
             loginProcess(req,resp,true);
@@ -67,7 +65,7 @@ public class UserLogin extends HttpServlet{
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         if(username==null || password==null || password.length()<5){
