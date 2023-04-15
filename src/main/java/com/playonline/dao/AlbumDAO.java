@@ -15,17 +15,38 @@ import java.util.List;
 public class AlbumDAO {
     PreparedStatement addAlbumStatement;
     PreparedStatement getAlbumByIDStatement;
+    PreparedStatement getUserAlbumsStatement;
     String folder;
     public AlbumDAO(Connection connection, String folder) throws SQLException{
         this.folder = folder;
         String addAlbumQuery = "INSERT INTO album(a_name,a_artist_ID,a_date) VALUES (?,?,?)";
-        String getAlbumByIDQuery = "SELECT * FROM album JOIN artist ON a_artist_ID=a_ID WHERE a_ID=?";
+        String getAlbumByIDQuery = "SELECT a_date, a_name, ar_name, ar_ID FROM album JOIN artist ON a_artist_ID=ar_ID WHERE a_ID=? ";
+        String getUserAlbums = "SELECT a_ID, a_name, a_date, ar_ID, ar_name " +
+                "FROM song JOIN album ON s_album_ID=a_ID JOIN artist ON a_artist_ID=ar_ID " +
+                "WHERE s_owner = ? " +
+                "GROUP BY a_ID, ar_name, a_name "+
+                "ORDER BY ar_name, a_name ";
         addAlbumStatement = connection.prepareStatement(addAlbumQuery, Statement.RETURN_GENERATED_KEYS);
         getAlbumByIDStatement = connection.prepareStatement(getAlbumByIDQuery);
+        getUserAlbumsStatement = connection.prepareStatement(getUserAlbums);
     }
 
-    public List<Album> getUserAlbums(String username){
-        return new ArrayList<>();
+    public List<Album> getUserAlbums(String username) throws SQLException {
+        getUserAlbumsStatement.setString(1,username);
+        ResultSet result = getUserAlbumsStatement.executeQuery();
+        List<Album> albums = new ArrayList<>();
+        while(result.next()){
+            Album album = new Album();
+            album.setId(result.getInt("a_ID"));
+            album.setName(result.getString("a_name"));
+            album.setDate(new Date(result.getDate("a_date").getTime()));
+            Artist artist = new Artist();
+            artist.setID(result.getInt("ar_ID"));
+            artist.setName(result.getString("ar_name"));
+            album.setArtist(artist);
+            albums.add(album);
+        }
+        return albums;
     }
 
     public Album getAlbum(int albumID) throws SQLException, InvalidParameterException{
@@ -39,6 +60,7 @@ public class AlbumDAO {
         album.setName(result.getString("a_name"));
         Artist artist = new Artist();
         artist.setName(result.getString("ar_name"));
+        artist.setID(result.getInt("ar_ID"));
         album.setArtist(artist);
         album.setDate(new Date(result.getDate("a_date").getTime()));
         album.setId(albumID);

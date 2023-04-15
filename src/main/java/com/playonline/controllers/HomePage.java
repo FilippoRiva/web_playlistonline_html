@@ -55,6 +55,14 @@ public class HomePage extends HttpServlet {
             resp.sendRedirect("/PlaylistOnline/login");
             return;
         }
+        Object addingNewAlbum = req.getAttribute("addingNewAlbum");
+        if(addingNewAlbum==null) {
+            String att = req.getParameter("a");
+            if(att!=null){
+                addingNewAlbum =Boolean.parseBoolean(att);
+                req.setAttribute("addingNewAlbum",addingNewAlbum);
+            }
+        }
         //keeping form input
         String s_title = req.getParameter("s_title");
         String s_genre = req.getParameter("s_genre");
@@ -82,7 +90,6 @@ public class HomePage extends HttpServlet {
 
 
 
-        Object addingNewAlbum = req.getAttribute("addingNewAlbum");
         List<Playlist> playlists = null;
         try {
             playlists = playlistDAO.getUserPlaylists(user.getUsername());
@@ -102,7 +109,12 @@ public class HomePage extends HttpServlet {
             }
             else {
                 context.setVariable("newAlbum",false);
-                context.setVariable("albums",albumDAO.getUserAlbums(user.getUsername()));
+                try {
+                    context.setVariable("albums",albumDAO.getUserAlbums(user.getUsername()));
+                } catch (SQLException e) {
+                    resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    return;
+                }
             }
         }
         context.setVariable("selectedId",selectedId);
@@ -113,12 +125,11 @@ public class HomePage extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String att = req.getParameter("a");
-        if(att ==null){
-            resp.sendRedirect("/PlaylistOnline/home");
-            return;
+        if(att!=null) {
+            boolean addingNewAlbum;
+            addingNewAlbum = Boolean.parseBoolean(att);
+            req.setAttribute("addingNewAlbum", addingNewAlbum);
         }
-        boolean addingNewAlbum = Boolean.parseBoolean(att);
-        req.setAttribute("addingNewAlbum",addingNewAlbum);
         doGet(req,resp);
     }
 

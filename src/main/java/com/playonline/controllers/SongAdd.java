@@ -10,6 +10,7 @@ import com.playonline.utils.GenreEnum;
 import com.playonline.utils.MySQLConnections;
 import com.playonline.utils.exceptions.SongNameNotAvailable;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
@@ -33,6 +34,8 @@ public class SongAdd extends HttpServlet {
     SongDAO songDAO;
     AlbumDAO albumDAO;
     ArtistDAO artistDAO;
+    RequestDispatcher homeATrue;
+    RequestDispatcher homeAFalse;
 
     @Override
     public void init() throws ServletException {
@@ -46,6 +49,8 @@ public class SongAdd extends HttpServlet {
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+        homeATrue = getServletContext().getRequestDispatcher("/home?a=true");
+        homeAFalse = getServletContext().getRequestDispatcher("/home?a=false");
     }
 
     @Override
@@ -70,22 +75,31 @@ public class SongAdd extends HttpServlet {
         String a_ID_str = req.getParameter("a_ID");
         String ar_name = req.getParameter("ar_name");
         String a_date_str = req.getParameter("a_date");
-        if(a_ID_str==null && (song==null || s_title == null || s_title.equals("") ||
+        if(a_ID_str==null && (song.getSize()==0 || s_title == null || s_title.equals("") ||
                 a_name==null || a_name.equals("") || ar_name==null || ar_name.equals("") ||
-                a_date_str == null || cover==null || s_genre==null)){
-            //TODO compila i campi per favore;
+                a_date_str.equals("") || cover.getSize()==0 || s_genre==null || s_genre.equals("none"))){
+            homeATrue.forward(req,resp);
             return;
         }
-        if( a_ID_str!=null && (song==null || s_title == null || s_title.equals(""))){
-            //TODO compila i campi per favore;
+        if( a_ID_str!=null && (song.getSize()==0 || s_title == null || s_title.equals("") || s_genre==null || s_genre.equals("none"))){
+            homeAFalse.forward(req,resp);
             return;
         }
         int a_ID = -1;
+        Date a_date = null;
+        if(a_ID_str==null){
+            try {
+                a_date = new SimpleDateFormat("yyyy-dd-MM").parse(a_date_str);
+            } catch (ParseException e) {
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+        }
         if(a_ID_str!=null){
             try {
                 a_ID = Integer.parseInt(a_ID_str);
             }catch (NumberFormatException e){
-                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);                
+                resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
         }
@@ -96,20 +110,13 @@ public class SongAdd extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        Date a_date;
-        try {
-            a_date = new SimpleDateFormat("yyyy-dd-MM").parse(a_date_str);
-        } catch (ParseException e) {
-            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
-            return;
-        }
 
         //query
         Album album = null;
         Artist artist;
         try {
-            artist = artistDAO.addArtist(user.getUsername(),ar_name);
             if(a_ID_str==null) {
+                artist = artistDAO.addArtist(user.getUsername(),ar_name);
                 album = albumDAO.addAlbum(a_name, artist, a_date, cover, user.getUsername());
             } else {
                 album = albumDAO.getAlbum(a_ID);
@@ -139,7 +146,10 @@ public class SongAdd extends HttpServlet {
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
-            //TODO reinserire nome per favore
+            if(a_ID_str==null) homeATrue.forward(req,resp);
+            else homeAFalse.forward(req,resp);
         }
+        //success
+        resp.sendRedirect("home?a=false&s="+album.getId());
     }
 }

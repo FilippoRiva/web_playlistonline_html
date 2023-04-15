@@ -38,7 +38,7 @@
 
     <form action = "/PlaylistOnline/song-add" method = "post" autocomplete="off"  enctype="multipart/form-data">
         <label for="s_title" >Title :</label>
-        <input type="text" id="s_title" name="s_title" th:value="${param.s_title}" th:autofocus="${!adding}"><br>
+        <input type="text" id="s_title" name="s_title" th:value="${param.s_title}"><br>
 
         <label for="s_genre" >Genre :</label>
         <select id="s_genre" name="s_genre">
@@ -46,7 +46,7 @@
             <option th:each="genre : ${genres}"
                      th:value="${genre.name}"
                      th:text="${genre.name}"
-                     th:selected="${selectedId} == ${genre.id}">
+                     th:selected="${selectedId == genre.id}">
             </option>
         </select><br>
 
@@ -56,7 +56,7 @@
 
         <div th:if="${adding&&newAlbum}">
             <label for="ar_name">Artist : </label>
-            <input type="text" id="ar_name" name="ar_name" th:value="${param.ar_name}" th:autofocus="${newAlbum}"><br>
+            <input type="text" id="ar_name" name="ar_name" th:value="${param.ar_name}"><br>
             <label for="a_name">Album Title : </label>
             <input type="text" id="a_name" name="a_name" th:value="${param.a_name}"><br>
             <label for="a_date">Release Date : </label>
@@ -65,16 +65,17 @@
             <input type="file"
                    id="a_cover"
                    name="a_cover"
-                   th:value="${param.a_cover}"
                    accept="image/*">
         </div>
 
         <div th:if="${adding&&!newAlbum&&albums.size!=0}">
             <label for="a_ID">Album :</label>
-            <select id="a_ID" name="a_ID" th:value="${param.s_album}">
+            <select id="a_ID" name="a_ID">
                 <option th:each="album : ${albums}"
                         th:value="${album.id}"
-                        value="1">Album 1</option>
+                        th:label="${album.artist.name}+' - '+${album.name}"
+                        th:selected="${album.id==param.s} or (${param.s==null} and ${param.a_ID==album.id})">
+                </option>
             </select><br>
         </div>
 

@@ -7,7 +7,6 @@ public class Album {
     String name;
     Artist artist;
     Date date;
-    String coverURL;
     public int getId() {
         return id;
     }
@@ -40,11 +39,4 @@ public class Album {
         this.date = date;
     }
 
-    public String getCoverURL() {
-        return coverURL;
-    }
-
-    public void setCoverURL(String coverURL) {
-        this.coverURL = coverURL;
-    }
 }
