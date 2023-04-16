@@ -2,10 +2,7 @@ package com.playonline.dao;
 
 import com.playonline.beans.*;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +10,8 @@ public class PlaylistDAO {
     PreparedStatement getUserPlaylistsStatement;
     PreparedStatement isPlaylistUserCoupleValidStatement;
     PreparedStatement getPlaylistInfoStatement;
+    PreparedStatement addPlaylistStatement;
+    PreparedStatement addSongToPlaylistStatement;
     public PlaylistDAO(Connection connection) throws SQLException{
         String getUserPlaylistsQuery = "SELECT p_title,p_id,p_date FROM playlist WHERE p_owner=? ORDER BY p_date";
         String isPlaylistUserValid = "SELECT COUNT(*) FROM playlist WHERE p_owner=? AND p_ID=?";
@@ -22,9 +21,13 @@ public class PlaylistDAO {
                 "JOIN playlistsongs ON playlists.playlist_id=playlistsongs.playlist_id" +
                 "JOIN songs ON playlistsongs.song_id=songs.song_id" +
                 "WHERE playlists.playlist_id=?";
+        String addPlaylistQuery = "INSERT INTO playlist(p_owner,p_title,p_date) VALUES (?,?,?)";
+        String addSongQuery = "INSERT INTO playlistsong(s_ID,p_ID) VALUES(?,?)";
         getUserPlaylistsStatement = connection.prepareStatement(getUserPlaylistsQuery);
         isPlaylistUserCoupleValidStatement = connection.prepareStatement(isPlaylistUserValid);
         getPlaylistInfoStatement = connection.prepareStatement(getPlaylistInfoQuery);
+        addPlaylistStatement = connection.prepareStatement(addPlaylistQuery,Statement.RETURN_GENERATED_KEYS);
+        addSongToPlaylistStatement = connection.prepareStatement(addSongQuery);
     }
 
     public List<Playlist> getUserPlaylists(String username) throws SQLException{
@@ -40,6 +43,22 @@ public class PlaylistDAO {
             result.add(playlist);
         }
         return result;
+    }
+
+    public int createPlaylist(String username, String playlistName) throws SQLException {
+        addPlaylistStatement.setString(1,username);
+        addPlaylistStatement.setString(2,playlistName);
+        addPlaylistStatement.setDate(3,new Date(System.currentTimeMillis()));
+        addPlaylistStatement.executeUpdate();
+        ResultSet result = addPlaylistStatement.getGeneratedKeys();
+        result.next();
+        return result.getInt(1);
+    }
+
+    public void addSongToPlaylist(int pId, int sId) throws SQLException {
+        addSongToPlaylistStatement.setInt(1,sId);
+        addSongToPlaylistStatement.setInt(2,pId);
+        addSongToPlaylistStatement.executeUpdate();
     }
 
     public Playlist getPlaylistInfo(int playlistID) throws SQLException{

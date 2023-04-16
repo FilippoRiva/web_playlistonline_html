@@ -1,22 +1,25 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" type="text/css" href="css/style.css">
 <head>
     <meta charset="UTF-8">
     <title>PlaylistOnline</title>
 </head>
 <body>
-
-<h1>Login</h1>
-<form action = "/PlaylistOnline/login" method = "post" autocomplete="off">
-    <label for="username" >Username:</label><br>
-    <input type="text" id="username" name="username" th:value="${param.username}"><br>
-    <label for="password">Password:</label><br>
-    <input type="password" id="password" name="password"><br>
-    <input type="submit" value="Sign in"><br>
-</form>
-<span th:text="${invalid} ? 'Invalid Credentials':''"></span>
+<div class="centered-form">
+    <h1>Login</h1>
+    <form action = "/PlaylistOnline/login" method = "post" autocomplete="off">
+        <label for="username" >Username:</label><br>
+        <input type="text" id="username" name="username" th:value="${param.username}"><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password"><br>
+        <br><br><br>
+        <input class="button" type="submit" value="Sign in"><br>
+    </form>
+    <span th:text="${invalid} ? 'Invalid Credentials':''"></span>
+    <br>
+    <br>
+    <a class="link" href="registration">register</a>
+</div>
 </body>
-<br>
-<br>
-<a href="registration">register</a>
 </html>

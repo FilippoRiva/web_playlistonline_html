@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" type="text/css" href="css/home.css">
+<head>
+    <meta charset="UTF-8">
+    <title>PlaylistOnline</title>
+</head>
+<body>
+
+<button>
+    <a href="home">Home</a>
+</button>
+<h1 th:text="${playlist.name}">Playlist</h1>
+<div class="song-navigation">
+    <div class="back" th:if="hasPrevious">
+        Back
+    </div>
+    <div class="current-songs">
+        <div class="song-info" th:each="song : ${playlist.songs}">
+            <div class="album-cover" th:href="'cover?a='+${song.album.id}">
+                Cover
+            </div>
+            <div class="song-title" th:text="${song.title}">
+                Canzone
+            </div>
+            <div class="artist-name" th:text="${song.album.artist.name}">
+                Artista
+            </div>
+        </div>
+    </div>
+    <div class="next" th:if="hasNext">
+        Next
+    </div>
+</div>
+<div class="song-adder-container">
+    Song Adder
+</div>
+
+
+</body>

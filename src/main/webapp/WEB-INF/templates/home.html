@@ -1,138 +1,136 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" type="text/css" href="css/home.css">
 <head>
     <meta charset="UTF-8">
     <title>PlaylistOnline</title>
 </head>
 <body>
-    User : <span th:text="${session.user.username}">no_name</span>
-    <br>
-    <form th:align="left" action = "/PlaylistOnline/logout" method = "post">
-        <input type="submit" value="Logout"><br>
-    </form>
+    <div class="logout">
+        <form th:align="left" action = "/PlaylistOnline/logout" method = "post">
+            <input class="button" type="submit" value="Logout">
+        </form>
+    </div>
 
     <h1>Playlists</h1>
 
-    <table border="1" cellpadding="10" >
-        <thead>
-            <th></th>
-            <th>Creation date</th>
-        </thead>
-        <tbody>
-        <tr th:each="playlist :${playlists}">
-            <td>
-               <a href="/playlist?id=1" th:text="${playlist.name}"
-                  th:href="@{/playlist(id=${playlist.id},page=1)}">
-                   Playlist 1
-               </a>
-            </td>
-            <td th:text="${playlist.date}">0/00/0001</td>
-        </tr>
-        </tbody>
-    </table>
-    <br>
-
-    <hr>
-
-    <h1>Add a new song to your songs</h1>
-
-    <form action = "/PlaylistOnline/song-add" method = "post" autocomplete="off"  enctype="multipart/form-data">
-        <label for="s_title" >Title :</label>
-        <input type="text" id="s_title" name="s_title" th:value="${param.s_title}"><br>
-
-        <label for="s_genre" >Genre :</label>
-        <select id="s_genre" name="s_genre">
-            <option th:value="none">choose an option</option>
-            <option th:each="genre : ${genres}"
-                     th:value="${genre.name}"
-                     th:text="${genre.name}"
-                     th:selected="${selectedId == genre.id}">
-            </option>
-        </select><br>
-
-        <button type="submit" formaction="/PlaylistOnline/home?a=true">New Album</button>
-
-        <button type="submit" formaction="/PlaylistOnline/home?a=false">Existing Album</button>
-
-        <div th:if="${adding&&newAlbum}">
-            <label for="ar_name">Artist : </label>
-            <input type="text" id="ar_name" name="ar_name" th:value="${param.ar_name}"><br>
-            <label for="a_name">Album Title : </label>
-            <input type="text" id="a_name" name="a_name" th:value="${param.a_name}"><br>
-            <label for="a_date">Release Date : </label>
-            <input type="date" id="a_date" name="a_date" th:value="${param.a_date}"><br>
-            <label for="a_cover">Cover :</label>
-            <input type="file"
-                   id="a_cover"
-                   name="a_cover"
-                   accept="image/*">
+    <div th:if="${playlists.size()!=0}" class="playlist-table">
+        <div class="row" th:each="playlist :${playlists}">
+            <a class="left" href="/playlist?id=1" th:text="${playlist.name}"
+               th:href="@{/playlist(id=${playlist.id},page=1)}">
+               Playlist 1
+            </a>
+            <span class="right" th:text="${playlist.date}">0/00/0001</span>
         </div>
+    </div>
 
-        <div th:if="${adding&&!newAlbum&&albums.size!=0}">
-            <label for="a_ID">Album :</label>
-            <select id="a_ID" name="a_ID">
-                <option th:each="album : ${albums}"
-                        th:value="${album.id}"
-                        th:label="${album.artist.name}+' - '+${album.name}"
-                        th:selected="${album.id==param.s} or (${param.s==null} and ${param.a_ID==album.id})">
+
+    <h1>Add a Song</h1>
+
+    <form class="song-form" action = "/PlaylistOnline/song-add" method = "post" autocomplete="off"  enctype="multipart/form-data">
+        <div class="row">
+            <label class="left" for="s_title" >Title</label>
+            <input class="right" type="text" id="s_title" name="s_title" th:value="${param.s_title}">
+        </div>
+        <div class="row">
+            <label class="left" for="s_genre" >Genre</label>
+            <select class="right" id="s_genre" name="s_genre">
+                <option th:value="none">choose an option</option>
+                <option th:each="genre : ${genres}"
+                         th:value="${genre.name}"
+                         th:text="${genre.name}"
+                         th:selected="${selectedId == genre.id}">
                 </option>
-            </select><br>
+            </select>
         </div>
-
+        <div class="album-switch-container">
+            <div class="album-switch">
+                <button class="button" type="submit" formaction="/PlaylistOnline/home?a=true">New Album</button>
+            </div>
+            <div class="album-switch">
+                <button class="button" type="submit" formaction="/PlaylistOnline/home?a=false">Existing Album</button>
+            </div>
+        </div>
+        <div th:if="${adding&&newAlbum}">
+            <div class="row">
+                <label class="left" for="ar_name">Artist</label>
+                <input class="right" type="text" id="ar_name" name="ar_name" th:value="${param.ar_name}">
+            </div>
+            <div class="row">
+                <label class="left" for="a_name">Album Title</label>
+                <input class="right" type="text" id="a_name" name="a_name" th:value="${param.a_name}">
+            </div>
+            <div class="row">
+                <label class="left" for="a_date">Release Date</label>
+                <input class="right" type="date" id="a_date" name="a_date" th:value="${param.a_date}">
+            </div>
+            <div class="row">
+                <label class="left" for="a_cover">Cover</label>
+                <input class="right" type="file"
+                       id="a_cover"
+                       name="a_cover"
+                       accept="image/*">
+            </div>
+        </div>
+        <div th:if="${adding&&!newAlbum&&albums.size!=0}">
+            <div class="row">
+                <label class="left" for="a_ID">Album</label>
+                <select class="right" id="a_ID" name="a_ID">
+                    <option th:each="album : ${albums}"
+                            th:value="${album.id}"
+                            th:label="${album.artist.name}+' - '+${album.name}"
+                            th:selected="${album.id==param.s} or (${param.s==null} and ${param.a_ID==album.id})">
+                    </option>
+                </select><br>
+            </div>
+        </div>
         <span th:if="${adding&&!newAlbum&&albums.size==0}">
-            <br>No albums available<br>
+            <div class="row">
+                <div class="centered-text"> No albums available </div>
+            </div>
         </span>
-
         <div th:if="${adding}">
-            <label for="s_file">Audio File :</label>
-            <input type="file" id="s_file" name="s_file"
-
-
-
-                   th:value="${param.s_file}" accept="audio/*"><br>
-            <button type="submit">Add</button>
+            <div class="row">
+                <label class="left" for="s_file">Audio File</label>
+                <input class="right" type="file" id="s_file" name="s_file"
+                       th:value="${param.s_file}" accept="audio/*"><br>
+            </div>
+            <div class="row">
+                <button class="button" type="submit">Add</button>
+            </div>
         </div>
-
     </form>
 
-    <hr>
+    <h1>Create a Playlist</h1>
 
-    <h1>Create a new Playlist</h1>
-    <form action = "/PlaylistOnline/create-playlist" method = "post" autocomplete="off">
-        <label for="p_title" >Playlist Title:</label>
-        <input type="text" id="p_title" name="p_title"><br>
-        <br>
-        <span>
-            Pick the songs you want to add : <br>
-        </span>
-        <span th:if="${artists.size()==0}">
-            You have no songs uploaded<br>
-        </span>
-        <table th:if="${artists.size()!=0}" border="1">
-            <th>Artist</th>
-            <th></th>
-            <tr th:each="artist : ${artists}">
-                <td th:text="${artist.name}">artist name</td>
-                <td>
-                    <table border="1">
-                        <tr th:each="album : ${artist.albums}">
-                            <td th:text="${album.name}">album</td>
-                            <td>
-                                <table border="1">
-                                    <tr th:each="song : ${album.songs}">
-                                        <td th:text="${song.title}"> song title</td>
-                                        <td>
-                                            <input type="checkbox" th:value="${song.id}">
-                                        </td>
-                                    </tr>
-                                </table>
-                            </td>
-                        </tr>
-                    </table>
-                </td>
-            </tr>
-        </table>
-        <input type="submit" value="Create"><br>
+    <form class="playlist-form" action = "/PlaylistOnline/playlist-add" method = "post" autocomplete="off">
+        <div class="row">
+        <label class="left" for="p_title" >Title:</label>
+        <input class="right" type="text" id="p_title" name="p_title"><br>
+        </div>
+        <div th:if="${artists.size()==0}">
+            <br>You have no songs uploaded<br>
+        </div>
+        <div class="artist-container" th:if="${artists.size()!=0}" >
+            <div class="artist" th:each="artist : ${artists}">
+                <div class="artist-text" th:text="${artist.name}">artist name</div>
+                <div class="artist-albums" >
+                    <div class="album" th:each="album : ${artist.albums}">
+                        <div class="album-title" th:text="${album.name}">album</div>
+                            <div class="album-songs" >
+                                <div class="song" th:each="song : ${album.songs}">
+                                    <div class="song-title" th:text="${song.title}"> song title</div>
+                                    <div class="song-checkbox">
+                                        <input type="checkbox" th:name="s_ID" th:value="${song.id}">
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input class="button"type="submit" value="Create">
     </form>
 
 </body>

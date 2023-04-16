@@ -1,28 +1,30 @@
 <!DOCTYPE html>
 <html lang="en">
 <html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" type="text/css" href="css/style.css">
 <head>
     <meta charset="UTF-8">
     <title>PlaylistOnline</title>
 </head>
 <body>
-
-<h1>Registration</h1>
-<form action = "/PlaylistOnline/registration" method = "post" autocomplete="off">
-    <label for="username">Username:</label><br>
-    <input type="text" id="username" name="username" th:value="${param.username}"><br>
-    <label for="password">Password (5 characters minimum):</label><br>
-    <input type="password" id="password" name="password" th:value="${param.password}"><br>
-    <label for="passwordCopy">Confirm Password:</label><br>
-    <input type="password" id="passwordCopy" name="passwordCopy" th:value="${param.passwordCopy}"><br>
-    <input type="submit" value="Register"><br>
-</form>
-<span th:text="${usernameInvalid} ? 'invalid username' : ''"></span>
-<span th:text="${passwordInvalid} ? 'invalid password' : ''"></span>
-<span th:text="${passwordCopyInvalid} ? 'passwords do no match' : ''"></span>
-<span th:text="${usernameUnavailable} ? 'username is not available' : ''"></span>
-<br>
-<br>
-<a href="/PlaylistOnline/login">login</a>
+<div class="centered-form">
+    <h1>Registration</h1>
+    <form action = "/PlaylistOnline/registration" method = "post" autocomplete="off">
+        <label for="username">Username:</label><br>
+        <input type="text" id="username" name="username" th:value="${param.username}"><br>
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" th:value="${param.password}"><br>
+        <label for="passwordCopy">Confirm Password:</label><br>
+        <input type="password" id="passwordCopy" name="passwordCopy" th:value="${param.passwordCopy}"><br>
+        <br>
+        <input class="button" type="submit" value="Register"><br>
+    </form>
+    <span th:text="${usernameInvalid} ? 'invalid username' : ''"></span>
+    <span th:text="${passwordInvalid} ? 'invalid password' : ''"></span>
+    <span th:text="${passwordCopyInvalid} ? 'passwords do no match' : ''"></span>
+    <span th:text="${usernameUnavailable} ? 'username is not available' : ''"></span>
+    <br>
+    <a class="link" href="/PlaylistOnline/login">login</a>
+</div>
 </body>
 </html>
