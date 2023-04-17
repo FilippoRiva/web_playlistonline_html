@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<link rel="stylesheet" type="text/css" href="css/song.css">
+<head>
+    <meta charset="UTF-8">
+    <title>PlaylistOnline</title>
+</head>
+<body>
+    <div class="album-cover">
+        <img th:src="@{/cover(aID=${song.album.id},arID=${song.album.artist.ID})}">
+    </div>
+    <div class="audio-player">
+        <audio controls>
+            <source th:src="@{/songfile(arID=${song.album.artist.ID},aID=${song.album.id},id=${song.id})}">
+            No support
+        </audio>
+    </div>
+    <div class="song-info">
+        <div class="song-title" th:text="${song.title}"> song </div>
+        <div class="album" th:text="${song.album.name}">album </div>
+        <div class="artist" th:text="${song.album.artist.name}"> artists  </div>
+    </div>
+</body>
