@@ -78,9 +78,8 @@ public class AlbumDAO {
         int currentID = keys.getInt(1);
         // path generation
         String filename = cover.getSubmittedFileName();
-        String extension = filename.substring(filename.lastIndexOf("."));
         String dir = folder+username+"/"+artist.getID()+"/"+currentID+"/";
-        String filePath = dir+"cover"+extension;
+        String filePath = dir+"cover";
         // saving cover image
         try {
             File f = new File(dir);

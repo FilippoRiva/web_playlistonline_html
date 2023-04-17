@@ -1,0 +1,99 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Courier New", monospace;
+    color:white;
+    background: black;
+    margin-left: 15%;
+    margin-right: 15%;
+    margin-top: 2%;
+    font-size: 22px;
+}
+
+.home {
+    position: fixed;
+    top:15px;
+    right:15px;
+}
+
+h1 {
+    text-align: center;
+    cursor: default;
+}
+
+.song-navigation {
+    max-width: 1000px;
+    margin: auto;
+}
+
+.song-info {
+    float: left;
+    width: 20%;
+    padding: 5px;
+}
+
+.song-info:hover{
+    background: lawngreen;
+}
+
+.album-cover {
+    max-width: 300px;
+    max-height: 300px;
+    overflow: hidden;
+}
+
+.back {
+    position: absolute;
+    top:30%;
+    left:20%;
+}
+
+.next {
+    position: absolute;
+    top:30%;
+    left:75%;
+}
+
+.button {
+    position: relative;
+    width: 100%;
+    background-color: white;
+    border: none;
+    color: black;
+    padding: 3px 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+a:link{
+    text-decoration-color: darkgrey;
+    color:white
+}
+
+a:visited{
+    text-decoration-color: darkgrey;
+    color:white
+}
+
+input:focus{
+    outline: none;
+}
+
+.button:hover{
+    animation: .8 forwards 0.1s toGreenButton;
+}
+
+@keyframes toGreenButton {
+    100% {
+        background: black;
+        color: lawngreen;
+    }
+}
+
+@keyframes toGreenLink {
+    100% {color: lawngreen}
+}
