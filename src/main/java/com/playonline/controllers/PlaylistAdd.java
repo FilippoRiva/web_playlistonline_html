@@ -5,6 +5,7 @@ import com.playonline.dao.PlaylistDAO;
 import com.playonline.dao.SongDAO;
 import com.playonline.utils.MySQLConnections;
 
+import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -15,13 +16,15 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 
-@WebServlet("/playlist-add")
+@WebServlet("/playlist-create")
 public class PlaylistAdd extends HttpServlet {
     PlaylistDAO playlistDAO;
     SongDAO songDAO;
     Connection connection;
+    RequestDispatcher homeDispatcher;
     @Override
     public void init(){
+        homeDispatcher = getServletContext().getRequestDispatcher("/home");
         try {
             this.connection = MySQLConnections.getConnection(getServletContext());
             connection.setAutoCommit(false);
@@ -41,6 +44,10 @@ public class PlaylistAdd extends HttpServlet {
         }
         String title = req.getParameter("p_title");
         String username = user.getUsername();
+        if(title==null || title.equals("")){
+            homeDispatcher.forward(req,resp);
+            return;
+        }
         Map<String,String[]> parameters = req.getParameterMap();
         String[] songIDs = parameters.get("s_ID");
         try {

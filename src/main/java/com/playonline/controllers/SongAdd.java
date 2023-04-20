@@ -130,6 +130,7 @@ public class SongAdd extends HttpServlet {
                 throw new RuntimeException(ex);
             }
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
         } catch (SQLException e){
             try {
                 //sql rollback
@@ -140,6 +141,7 @@ public class SongAdd extends HttpServlet {
                 throw new RuntimeException(ex);
             }
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         } catch (SongNameNotAvailable e) {
             try {
                 connection.rollback();

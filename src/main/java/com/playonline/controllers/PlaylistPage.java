@@ -1,5 +1,6 @@
 package com.playonline.controllers;
 
+import com.playonline.beans.Artist;
 import com.playonline.beans.Playlist;
 import com.playonline.beans.User;
 import com.playonline.dao.PlaylistDAO;
@@ -10,7 +11,6 @@ import org.thymeleaf.context.WebContext;
 import org.thymeleaf.web.IWebExchange;
 import org.thymeleaf.web.servlet.JavaxServletWebApplication;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.List;
 
 @WebServlet("/playlist")
 public class PlaylistPage extends HttpServlet {
@@ -60,14 +61,20 @@ public class PlaylistPage extends HttpServlet {
             return;
         }
         Playlist playlist;
+        List<Artist> remainingArtists;
         boolean hasNext = false;
+        boolean empty = false;
         try {
             playlist = playlistDAO.getPlaylistPage(p_ID, user.getUsername(), page);
+            remainingArtists = playlistDAO.getRemainingArtists(p_ID,user.getUsername());
             if(playlist==null){
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            if(playlist.getSongs().size()==6){
+            if(playlist.getSongs()==null){
+                empty = true;
+            }
+            else if(playlist.getSongs().size()==6){
                 playlist.setSongs(playlist.getSongs().subList(0,5));
                 hasNext = true;
             }
@@ -78,9 +85,11 @@ public class PlaylistPage extends HttpServlet {
         IWebExchange webExchange = application.buildExchange(req,resp);
         WebContext context = new WebContext(webExchange);
         context.setVariable("playlist",playlist);
+        context.setVariable("artists",remainingArtists);
         context.setVariable("hasNext", hasNext);
         context.setVariable("prevPage",prevPage);
         context.setVariable("nextPage",nextPage);
+        context.setVariable("emptyPlaylist",empty);
         templateEngine.process("playlist",context,resp.getWriter());
     }
 }

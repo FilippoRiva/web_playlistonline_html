@@ -20,4 +20,9 @@
         <div class="album" th:text="${song.album.name}">album </div>
         <div class="artist" th:text="${song.album.artist.name}"> artists  </div>
     </div>
+    <a th:href="@{/playlist(id=${param.p},page=${param.page})}">
+    <div class="button">
+        go back to playlist
+    </div>
+    </a>
 </body>

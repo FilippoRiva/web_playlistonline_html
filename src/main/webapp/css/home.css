@@ -248,6 +248,10 @@ input:focus{
     animation: .8 forwards 0.1s toGreenButton;
 }
 
+.hide {
+    display: none;
+}
+
 @keyframes toGreenButton {
     100% {
         background: black;

@@ -87,6 +87,7 @@
         <span th:if="${adding&&!newAlbum&&albums.size==0}">
             <div class="row">
                 <div class="centered-text"> No albums available </div>
+                <input class="hide" th:name="a_ID" th:value="0">
             </div>
         </span>
         <div th:if="${adding}">
@@ -103,7 +104,7 @@
 
     <h1>Create a Playlist</h1>
 
-    <form class="playlist-form" action = "/PlaylistOnline/playlist-add" method = "post" autocomplete="off">
+    <form class="playlist-form" action = "/PlaylistOnline/playlist-create" method = "post" autocomplete="off">
         <div class="row">
         <label class="left" for="p_title" >Title:</label>
         <input class="right" type="text" id="p_title" name="p_title"><br>

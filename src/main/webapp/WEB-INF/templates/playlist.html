@@ -11,12 +11,12 @@
     <a href="home">Home</a>
 </button>
 <h1 th:text="${playlist.name}">Playlist</h1>
-<div class="song-navigation">
+<div class="song-navigation" th:if="${!emptyPlaylist}">
     <div class="back" th:if="${prevPage!=0}">
         <a th:href="@{/playlist(id=${param.id},page=${prevPage})}">Back</a>
     </div>
     <div class="current-songs">
-        <a  th:each="song : ${playlist.songs}" th:href="@{/song(id=${song.id})}">
+        <a  th:each="song : ${playlist.songs}" th:href="@{/song(id=${song.id},p=${playlist.id},page=${param.page})}">
         <div class="song-info" >
             <div class="album-cover">
                 <img th:src="@{/cover(aID=${song.album.id},arID=${song.album.artist.ID})}">
@@ -36,8 +36,39 @@
         </a>
     </div>
 </div>
+<div th:if="${emptyPlaylist}">
+    No Songs
+</div>
 <div class="song-adder-container">
-    Song Adder
+    <form class="playlist-form" action = "/PlaylistOnline/playlist-add" method = "post" autocomplete="off">
+        <div class="row">
+            <label class="left" for="p_title" >Title:</label>
+            <input class="right" type="text" id="p_title" name="p_title"><br>
+        </div>
+        <div th:if="${artists.size()==0}">
+            <br>No more songs to add<br>
+        </div>
+        <div class="artist-container" th:if="${artists.size()!=0}" >
+            <div class="artist" th:each="artist : ${artists}">
+                <div class="artist-text" th:text="${artist.name}">artist name</div>
+                <div class="artist-albums" >
+                    <div class="album" th:each="album : ${artist.albums}">
+                        <div class="album-title" th:text="${album.name}">album</div>
+                        <div class="album-songs" >
+                            <div class="song" th:each="song : ${album.songs}">
+                                <div class="song-title" th:text="${song.title}"> song title</div>
+                                <div class="song-checkbox">
+                                    <input type="checkbox" th:name="s_ID" th:value="${song.id}">
+                                </div>
+                            </div>
+                        </div>
+                        </td>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <input class="button"type="submit" value="Create">
+    </form>
 </div>
 
 
