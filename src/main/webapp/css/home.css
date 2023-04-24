@@ -1,28 +1,14 @@
-* {
-    box-sizing: border-box;
-}
+@import url(style.css);
+@import url(artists-table.css);
 
-body {
-    font-family: "Courier New", monospace;
-    color:white;
-    background: black;
-    margin-left: 15%;
-    margin-right: 15%;
-    margin-top: 2%;
-    font-size: 22px;
-}
-
+/*logout button*/
 .logout {
     position: fixed;
     top:15px;
     right:15px;
 }
 
-h1 {
-    text-align: center;
-    cursor: default;
-}
-
+/*playlist table*/
 .playlist-table{
     position: relative;
     margin: auto;
@@ -56,6 +42,7 @@ h1 {
     width: 33%;
 }
 
+/*song form*/
 .song-form {
     position: relative;
     margin: auto;
@@ -96,7 +83,6 @@ h1 {
 
 .song-form input[type="text"],input[type="date"]{
     padding: 2px;
-    border: 0;
 }
 
 .song-form input[type="file"]{
@@ -127,138 +113,4 @@ h1 {
     width: 60%;
 }
 
-.artist-container {
-    position: relative;
-    width: 100%;
-}
 
-.artist {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-    border: 1px solid dimgrey;
-}
-
-.artist-text {
-    position: relative;
-    display: inline-block;
-    height: 100%;
-    width: 20%;
-    border-right: 1px solid dimgrey;
-    text-align: center;
-}
-.artist-albums {
-    position: relative;
-    display: inline-block;
-    width: 77%;
-    height: 100%;
-}
-
-.album {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-}
-.album-title {
-    position: relative;
-    display: inline-block;
-    width: 30%;
-    height: 100%;
-    border-right: dimgrey 1px solid;
-    text-align: center;
-}
-
-.album:not(:last-child){
-    border-bottom: dimgrey 1px solid;
-}
-
-.song:not(:last-child){
-    border-bottom: dimgrey 1px solid;
-}
-
-.album-songs {
-    position: relative;
-    display: inline-block;
-    width: 66%;
-    height: 100%;
-}
-.song {
-    position: relative;
-    display: inline-block;
-    width: 100%;
-    height: 100%;
-}
-
-.song-title {
-    position: relative;
-    display: inline-block;
-    width: 90%;
-    height: 100%;
-    border-right: 1px dimgrey solid;
-    overflow: hidden;
-    text-align: center;
-}
-
-.song-checkbox {
-    position: relative;
-    display: inline-block;
-    width: 6%;
-    height: 100%;
-}
-
-.button {
-    position: relative;
-    width: 100%;
-    background-color: white;
-    border: none;
-    color: black;
-    padding: 3px 10px;
-    text-align: center;
-    text-decoration: none;
-    font-size: 16px;
-    cursor: pointer;
-}
-
-select {
-    position: relative;
-    padding: 2px;
-    height: 22px;
-    border: 0;
-    cursor: pointer;
-    background: white;
-}
-
-a:link{
-    text-decoration-color: darkgrey;
-    color:white
-}
-
-a:visited{
-    text-decoration-color: darkgrey;
-    color:white
-}
-
-input:focus{
-    outline: none;
-}
-
-.button:hover{
-    animation: .8 forwards 0.1s toGreenButton;
-}
-
-.hide {
-    display: none;
-}
-
-@keyframes toGreenButton {
-    100% {
-        background: black;
-        color: lawngreen;
-    }
-}
-
-@keyframes toGreenLink {
-    100% {color: lawngreen}
-}

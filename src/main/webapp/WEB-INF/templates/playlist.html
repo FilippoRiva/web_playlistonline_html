@@ -40,11 +40,7 @@
     No Songs
 </div>
 <div class="song-adder-container">
-    <form class="playlist-form" action = "/PlaylistOnline/playlist-add" method = "post" autocomplete="off">
-        <div class="row">
-            <label class="left" for="p_title" >Title:</label>
-            <input class="right" type="text" id="p_title" name="p_title"><br>
-        </div>
+    <form class="playlist-form" th:action = "@{/playlist-add(p_ID=${param.id},page=${param.page})}" method = "post" autocomplete="off">
         <div th:if="${artists.size()==0}">
             <br>No more songs to add<br>
         </div>

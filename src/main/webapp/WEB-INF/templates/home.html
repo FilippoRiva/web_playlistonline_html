@@ -118,15 +118,14 @@
                 <div class="artist-albums" >
                     <div class="album" th:each="album : ${artist.albums}">
                         <div class="album-title" th:text="${album.name}">album</div>
-                            <div class="album-songs" >
-                                <div class="song" th:each="song : ${album.songs}">
-                                    <div class="song-title" th:text="${song.title}"> song title</div>
-                                    <div class="song-checkbox">
-                                        <input type="checkbox" th:name="s_ID" th:value="${song.id}">
-                                    </div>
+                        <div class="album-songs" >
+                            <div class="song" th:each="song : ${album.songs}">
+                                <div class="song-title" th:text="${song.title}"> song title</div>
+                                <div class="song-checkbox">
+                                    <input type="checkbox" th:name="s_ID" th:value="${song.id}">
                                 </div>
                             </div>
-                        </td>
+                        </div>
                     </div>
                 </div>
             </div>

@@ -1,37 +1,64 @@
-body {
-    font-family: "Lucida Console", "Courier New", monospace;
+* {
+    box-sizing: border-box;
+    font-family: "Courier New", monospace;
     color:white;
     background: black;
-    margin-left: 10%;
-    margin-right: 10%;
-    margin-top: 12%;
+    font-size: 22px;
 }
+
+/*default html components*/
+h1 {
+    text-align: center;
+    cursor: default;
+}
+
+select {
+    position: relative;
+    padding: 2px;
+    height: 22px;
+    border: 0;
+    cursor: pointer;
+    background: white;
+}
+
+/*links*/
 a:link{
     color:white
 }
+
 a:visited{
     color:white
 }
 
-form input{
+/*generic button*/
+.button {
+    position: relative;
+    width: 100%;
     background-color: white;
     border: none;
     color: black;
     padding: 3px 10px;
     text-align: center;
     text-decoration: none;
-    display: inline-block;
     font-size: 16px;
-    margin: 5px 2px;
     cursor: pointer;
-    width: 150px;
-}
-div.centered-form{
-    text-align: center;
 }
 
 .button:hover, .link:hover{
     animation: 0.5 forwards 0.1s toGray;
+}
+
+/*hide class*/
+.hide {
+    display: none;
+}
+
+input:focus{
+    outline: none;
+}
+
+@keyframes toGreenLink {
+    100% {color: lawngreen}
 }
 
 @keyframes toGray {
