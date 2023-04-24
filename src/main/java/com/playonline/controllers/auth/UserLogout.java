@@ -16,6 +16,7 @@ public class UserLogout extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // removes auth cookie and user session attribute
         Cookie cookie = new Cookie("LOGIN_INFO","0");
         cookie.setMaxAge(0);
         resp.addCookie(cookie);

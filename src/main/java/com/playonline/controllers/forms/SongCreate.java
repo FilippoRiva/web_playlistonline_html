@@ -1,4 +1,4 @@
-package com.playonline.controllers;
+package com.playonline.controllers.forms;
 
 import com.playonline.beans.Album;
 import com.playonline.beans.Artist;
@@ -8,7 +8,6 @@ import com.playonline.dao.ArtistDAO;
 import com.playonline.dao.SongDAO;
 import com.playonline.utils.GenreEnum;
 import com.playonline.utils.MySQLConnections;
-import com.playonline.utils.exceptions.SongNameNotAvailable;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -28,7 +27,7 @@ import java.util.Date;
 
 @WebServlet("/song-add")
 @MultipartConfig
-public class SongAdd extends HttpServlet {
+public class SongCreate extends HttpServlet {
 
     Connection connection;
     SongDAO songDAO;
@@ -110,8 +109,12 @@ public class SongAdd extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+        if(!song.getContentType().startsWith("audio/") || !cover.getContentType().startsWith("image/")){
+            resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
+            return;
+        }
 
-        //query
+        // db update
         Album album = null;
         Artist artist;
         try {
@@ -133,7 +136,6 @@ public class SongAdd extends HttpServlet {
             return;
         } catch (SQLException e){
             try {
-                //sql rollback
                 connection.rollback();
                 //cover deletion when song query or song file save fails
                 albumDAO.deleteAlbumCover(user.getUsername(),album);
@@ -142,17 +144,8 @@ public class SongAdd extends HttpServlet {
             }
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
-        } catch (SongNameNotAvailable e) {
-            try {
-                connection.rollback();
-            } catch (SQLException ex) {
-                throw new RuntimeException(ex);
-            }
-            if(a_ID_str==null) homeATrue.forward(req,resp);
-            else homeAFalse.forward(req,resp);
         }
-        //success
-        assert album != null;
+        // success
         resp.sendRedirect("home?a=false&s="+album.getId());
     }
 }

@@ -1,4 +1,4 @@
-package com.playonline.controllers;
+package com.playonline.controllers.pages;
 
 import com.playonline.beans.Song;
 import com.playonline.beans.User;
@@ -40,11 +40,13 @@ public class SongPage extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // auth check
         User user = (User) req.getSession().getAttribute("user");
         if(user==null){
             resp.sendRedirect("login");
             return;
         }
+        // input parsing
         String id_str = req.getParameter("id");
         int id;
         try{
@@ -53,6 +55,8 @@ public class SongPage extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+
+        // page templating
         Song song;
         try {
             song = songDAO.getSongByID(id, user.getUsername());

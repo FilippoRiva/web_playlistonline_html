@@ -42,6 +42,7 @@ public class UserLogin extends HttpServlet{
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // auth cookie check
         Cookie[] cookies = req.getCookies();
         if(cookies==null) {
             loginProcess(req,resp,true);
@@ -54,6 +55,7 @@ public class UserLogin extends HttpServlet{
                     user = userDAO.checkCookie(c.getValue());
                 } catch (SQLException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+                    return;
                 }
                 if(user == null) break;
                 req.getSession(true).setAttribute("user", user);
@@ -66,12 +68,14 @@ public class UserLogin extends HttpServlet{
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // input parsing
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         if(username==null || password==null || password.length()<5){
             loginProcess(req,resp,false);
             return;
         }
+        // validity check
         User user = null;
         try {
             user = userDAO.checkCredentials(username,password);
@@ -82,9 +86,10 @@ public class UserLogin extends HttpServlet{
             loginProcess(req,resp,false);
             return;
         }
+        // new auth cookie
         req.getSession(true).setAttribute("user",user);
         Cookie cookie = new Cookie("LOGIN_INFO",user.getCookie());
-        cookie.setMaxAge(31536000);
+        cookie.setMaxAge(60*60*24*365);
         resp.addCookie(cookie);
         resp.sendRedirect("/PlaylistOnline/home");
     }

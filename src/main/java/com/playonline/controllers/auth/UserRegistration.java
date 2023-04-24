@@ -47,6 +47,7 @@ public class UserRegistration extends HttpServlet {
         String password = req.getParameter("password");
         String passwordCopy = req.getParameter("passwordCopy");
         WebContext context = new WebContext(application.buildExchange(req,resp));
+        // input parsing
         if(username==null || username.length()<1 || username.length()>30) {
             context.setVariable("usernameInvalid",true);
             req.setAttribute("password",password);
@@ -67,6 +68,8 @@ public class UserRegistration extends HttpServlet {
             templateEngine.process("registration",context,resp.getWriter());
             return;
         }
+        // registration attempt
+        String cookieVal = null;
         try {
             if(!userDAO.isUsernameAvailable(username)){
                 req.setAttribute("username",username);
@@ -75,23 +78,17 @@ public class UserRegistration extends HttpServlet {
                 context.setVariable("usernameUnavailable",true);
                 templateEngine.process("registration",context,resp.getWriter());
                 return;
+            } else {
+                cookieVal = userDAO.getNewCookie();
+                userDAO.addUser(username,password,cookieVal);
             }
         } catch (SQLException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
+            return;
         }
-        String cookieVal = null;
-        try {
-            cookieVal = userDAO.getNewCookie();
-        } catch (SQLException e) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
-        try {
-            userDAO.addUser(username,password,cookieVal);
-        } catch (SQLException e) {
-            resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
-        }
+        // auth cookie
         Cookie newCookie = new Cookie("LOGIN_INFO",cookieVal);
-        newCookie.setMaxAge(31536000);
+        newCookie.setMaxAge(60*60*24*365);
         resp.addCookie(newCookie);
         resp.sendRedirect("/PlaylistOnline/login");
     }

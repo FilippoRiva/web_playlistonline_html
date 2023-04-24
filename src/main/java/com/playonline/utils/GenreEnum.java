@@ -8,8 +8,8 @@ public enum GenreEnum {
     BLUES("Blues",5),
     SOUL("Soul",6),
     FUNK("Funk",7);
-    String name;
-    int id;
+    final String name;
+    final int id;
     GenreEnum(String name, int id){
         this.name = name;
         this.id=id;

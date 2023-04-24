@@ -1,4 +1,4 @@
-package com.playonline.controllers;
+package com.playonline.controllers.pages;
 
 import com.playonline.beans.Playlist;
 import com.playonline.beans.User;
@@ -49,11 +49,14 @@ public class HomePage extends HttpServlet {
     }
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
+        // auth check
         User user = (User) req.getSession().getAttribute("user");
         if(user == null) {
             resp.sendRedirect("/PlaylistOnline/login");
             return;
         }
+
+        // input parsing
         Object addingNewAlbum = req.getAttribute("addingNewAlbum");
         if(addingNewAlbum==null) {
             String att = req.getParameter("a");
@@ -62,7 +65,7 @@ public class HomePage extends HttpServlet {
                 req.setAttribute("addingNewAlbum",addingNewAlbum);
             }
         }
-        //keeping form input
+        // keeping genre input
         String s_genre = req.getParameter("s_genre");
         int selectedId=0;
         if(s_genre!=null){
@@ -73,12 +76,15 @@ public class HomePage extends HttpServlet {
             }
         }
 
+        // getting user playlist
         List<Playlist> playlists;
         try {
             playlists = playlistDAO.getUserPlaylists(user.getUsername());
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
+
+        // page templating
         IWebExchange webExchange = application.buildExchange(req,resp);
         WebContext context = new WebContext(webExchange);
         context.setVariable("playlists",playlists);
@@ -110,7 +116,6 @@ public class HomePage extends HttpServlet {
         templateEngine.process("home",context,resp.getWriter());
     }
 
-    //New Album selector
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String att = req.getParameter("a");

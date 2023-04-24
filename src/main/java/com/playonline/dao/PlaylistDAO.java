@@ -30,7 +30,16 @@ public class PlaylistDAO {
         String addPlaylistQuery = "INSERT INTO playlist(p_owner,p_title,p_date) VALUES (?,?,?)";
         String addSongQuery = "INSERT INTO playlistsong(s_ID,p_ID) VALUES(?,?)";
         String checkPlaylistExistenceQuery = "SELECT p_title, p_date, p_ID FROM playlist WHERE p_ID=? and p_owner=?";
-        String getRemainingArtistsQuery = "SELECT song.s_ID, s_title, s_genre, a_ID, a_name, a_date, ar_name FROM song JOIN album a on a.a_ID = song.s_album_ID JOIN artist a2 on a2.ar_ID = a.a_artist_ID JOIN playlistsong p on song.s_ID WHERE p.p_ID=? AND p.s_ID NOT IN(SELECT s_ID FROM playlistsong WHERE p_ID=?)";
+        String getRemainingArtistsQuery =
+                "SELECT s_ID, s_title, s_genre, a_ID, a_name, a_date, ar_name, ar_ID " +
+                "FROM song " +
+                "JOIN album a on a.a_ID = song.s_album_ID " +
+                "JOIN artist a2 on a2.ar_ID = a.a_artist_ID " +
+                "WHERE s_ID not in " +
+                "(SELECT s_ID " +
+                "FROM playlistsong " +
+                "JOIN playlist p on p.p_ID = playlistsong.p_ID " +
+                "WHERE p.p_owner=? and p.p_ID = ?)";
         getUserPlaylistsStatement = connection.prepareStatement(getUserPlaylistsQuery);
         isPlaylistUserCoupleValidStatement = connection.prepareStatement(isPlaylistUserValid);
         getPlaylistInfoStatement = connection.prepareStatement(getPlaylistInfoQuery);
@@ -120,10 +129,54 @@ public class PlaylistDAO {
         return playlist;
     }
 
-    public List<Artist> getRemainingArtists(int playlistID, String username){
+
+    public List<Artist> getRemainingArtists(int playlistID, String username) throws SQLException {
+        getRemainingArtistsStatement.setString(1,username);
+        getRemainingArtistsStatement.setInt(2,playlistID);
+        ResultSet result = getRemainingArtistsStatement.executeQuery();
         List<Artist> artists = new ArrayList<>();
-
-
+        Artist currentArtist = new Artist();
+        Album currentAlbum = new Album();
+        List<Album> currentAlbums = new ArrayList<>();
+        Song currentSong;
+        List<Song> currentSongs = new ArrayList<>();
+        if(!result.next()) return artists;
+        do {
+            //artist changes
+            if(currentArtist.getName()==null || currentArtist.getID()!=result.getInt("ar_ID")) {
+                if(currentArtist.getName()!=null) {
+                    currentArtist.setAlbums(currentAlbums);
+                    currentAlbums = new ArrayList<>();
+                    artists.add(currentArtist);
+                }
+                currentArtist = new Artist();
+                currentArtist.setID(result.getInt("ar_ID"));
+                currentArtist.setName(result.getString("ar_name"));
+            }
+            //album changes
+            if(currentAlbum.getName()==null || currentAlbum.getId()!= result.getInt("a_ID")){
+                currentAlbum.setSongs(currentSongs);
+                currentSongs = new ArrayList<>();
+                currentAlbum= new Album();
+                currentAlbum.setId(result.getInt("a_ID"));
+                currentAlbum.setArtist(currentArtist);
+                currentAlbum.setDate(new Date(result.getDate("a_date").getTime()));
+                currentAlbum.setName(result.getString("a_name"));
+                currentAlbums.add(currentAlbum);
+            }
+            //new song
+            currentSong = new Song();
+            currentSong.setAlbum(currentAlbum);
+            currentSong.setTitle(result.getString("s_title"));
+            currentSong.setId(result.getInt("s_ID"));
+            Genre genre = new Genre();
+            genre.setName(result.getString("s_genre"));
+            currentSong.setGenre(genre);
+            currentSongs.add(currentSong);
+        } while(result.next());
+        currentAlbum.setSongs(currentSongs);
+        currentArtist.setAlbums(currentAlbums);
+        artists.add(currentArtist);
         return artists;
     }
 }

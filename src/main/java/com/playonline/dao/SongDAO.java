@@ -5,7 +5,6 @@ import com.playonline.beans.Artist;
 import com.playonline.beans.Genre;
 import com.playonline.beans.Song;
 import com.playonline.utils.GenreEnum;
-import com.playonline.utils.exceptions.SongNameNotAvailable;
 
 import javax.servlet.http.Part;
 import java.io.File;
@@ -43,16 +42,12 @@ public class SongDAO {
     }
 
 
-    public void addSong(String owner, String title, GenreEnum genre, Part song, Album album) throws SQLException, SongNameNotAvailable {
+    public void addSong(String owner, String title, GenreEnum genre, Part song, Album album) throws SQLException{
         addSongStatement.setString(1,title);
         addSongStatement.setInt(2,album.getId());
         addSongStatement.setString(3, genre.name());
         addSongStatement.setString(4,owner);
-        try {
-            addSongStatement.executeUpdate();
-        } catch (SQLException e){
-            throw new SongNameNotAvailable();
-        }
+        addSongStatement.executeUpdate();
         ResultSet generatedKey = addSongStatement.getGeneratedKeys();
         generatedKey.next();
         int currentID = generatedKey.getInt(1);

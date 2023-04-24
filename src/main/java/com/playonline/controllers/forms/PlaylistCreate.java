@@ -1,4 +1,4 @@
-package com.playonline.controllers;
+package com.playonline.controllers.forms;
 
 import com.playonline.beans.User;
 import com.playonline.dao.PlaylistDAO;
@@ -17,7 +17,7 @@ import java.sql.SQLException;
 import java.util.Map;
 
 @WebServlet("/playlist-create")
-public class PlaylistAdd extends HttpServlet {
+public class PlaylistCreate extends HttpServlet {
     PlaylistDAO playlistDAO;
     SongDAO songDAO;
     Connection connection;
@@ -37,17 +37,20 @@ public class PlaylistAdd extends HttpServlet {
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+        // auth check
         User user = (User)req.getSession().getAttribute("user");
         if(user==null){
             resp.sendRedirect("login");
             return;
         }
+        // input parsing
         String title = req.getParameter("p_title");
         String username = user.getUsername();
         if(title==null || title.equals("")){
             homeDispatcher.forward(req,resp);
             return;
         }
+        // database update
         Map<String,String[]> parameters = req.getParameterMap();
         String[] songIDs = parameters.get("s_ID");
         try {
@@ -55,9 +58,10 @@ public class PlaylistAdd extends HttpServlet {
             if (songIDs != null) {
                 for (String s_ID : songIDs) {
                     try {
+                        //TODO check song ownership
                         int id = Integer.parseInt(s_ID);
                         playlistDAO.addSongToPlaylist(p_ID, id);
-                    } catch (NumberFormatException ignored) { //ignoring non parsable IDs
+                    } catch (NumberFormatException ignored) { // ignoring non parsable IDs
                     }
                 }
             }
