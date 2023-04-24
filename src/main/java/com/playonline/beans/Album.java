@@ -4,11 +4,11 @@ import java.util.Date;
 import java.util.List;
 
 public class Album {
-    int id;
-    String name;
-    Artist artist;
-    Date date;
-    List<Song> songs;
+    private int id;
+    private String name;
+    private Artist artist;
+    private Date date;
+    private List<Song> songs;
     public int getId() {
         return id;
     }

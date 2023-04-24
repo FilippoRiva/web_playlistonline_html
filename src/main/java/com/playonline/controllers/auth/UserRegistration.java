@@ -69,7 +69,7 @@ public class UserRegistration extends HttpServlet {
             return;
         }
         // registration attempt
-        String cookieVal = null;
+        String cookieVal;
         try {
             if(!userDAO.isUsernameAvailable(username)){
                 req.setAttribute("username",username);

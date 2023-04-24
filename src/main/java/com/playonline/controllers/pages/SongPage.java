@@ -2,7 +2,6 @@ package com.playonline.controllers.pages;
 
 import com.playonline.beans.Song;
 import com.playonline.beans.User;
-import com.playonline.dao.PlaylistDAO;
 import com.playonline.dao.SongDAO;
 import com.playonline.utils.MySQLConnections;
 import com.playonline.utils.TemplateEngines;

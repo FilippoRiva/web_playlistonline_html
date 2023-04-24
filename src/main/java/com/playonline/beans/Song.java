@@ -1,10 +1,10 @@
 package com.playonline.beans;
 
 public class Song {
-    String title;
-    Album album;
-    Genre genre;
-    int id;
+    private String title;
+    private Album album;
+    private Genre genre;
+    private int id;
     public String getTitle() {
         return title;
     }

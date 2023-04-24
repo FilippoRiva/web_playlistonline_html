@@ -4,10 +4,10 @@ import java.util.Date;
 import java.util.List;
 
 public class Playlist {
-    String name;
-    int id;
-    Date date;
-    List<Song> songs;
+    private String name;
+    private int id;
+    private Date date;
+    private List<Song> songs;
 
     public String getName() {
         return name;

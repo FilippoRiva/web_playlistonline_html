@@ -50,7 +50,7 @@ public class UserLogin extends HttpServlet{
         }
         for (Cookie c : cookies) {
             if (c.getName().equals("LOGIN_INFO")) {
-                User user = null;
+                User user;
                 try {
                     user = userDAO.checkCookie(c.getValue());
                 } catch (SQLException e) {

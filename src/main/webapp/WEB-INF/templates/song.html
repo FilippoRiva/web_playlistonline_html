@@ -7,11 +7,11 @@
 </head>
 <body>
     <div class="album-cover">
-        <img th:src="@{/cover(aID=${song.album.id},arID=${song.album.artist.ID})}">
+        <img src="/" th:src="@{/cover(aID=${song.album.id},arID=${song.album.artist.ID})}">
     </div>
     <div class="audio-player">
         <audio controls>
-            <source th:src="@{/songfile(arID=${song.album.artist.ID},aID=${song.album.id},id=${song.id})}">
+            <source src="/" th:src="@{/songfile(arID=${song.album.artist.ID},aID=${song.album.id},id=${song.id})}">
             No support
         </audio>
     </div>

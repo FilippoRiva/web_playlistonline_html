@@ -19,7 +19,7 @@
         <a  th:each="song : ${playlist.songs}" th:href="@{/song(id=${song.id},p=${playlist.id},page=${param.page})}">
         <div class="song-info" >
             <div class="album-cover">
-                <img th:src="@{/cover(aID=${song.album.id},arID=${song.album.artist.ID})}">
+                <img src="/" th:src="@{/cover(aID=${song.album.id},arID=${song.album.artist.ID})}">
             </div>
             <div class="song-title" th:text="${song.title}">
                 Canzone
@@ -58,12 +58,11 @@
                                 </div>
                             </div>
                         </div>
-                        </td>
                     </div>
                 </div>
             </div>
         </div>
-        <input class="button"type="submit" value="Create">
+        <input class="button" type="submit" value="Create">
     </form>
 </div>
 

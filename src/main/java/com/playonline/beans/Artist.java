@@ -3,9 +3,9 @@ package com.playonline.beans;
 import java.util.List;
 
 public class Artist {
-    String name;
-    int ID;
-    List<Album> albums;
+    private String name;
+    private int ID;
+    private List<Album> albums;
 
     public int getID() {
         return ID;

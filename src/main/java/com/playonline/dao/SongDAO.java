@@ -51,7 +51,6 @@ public class SongDAO {
         ResultSet generatedKey = addSongStatement.getGeneratedKeys();
         generatedKey.next();
         int currentID = generatedKey.getInt(1);
-        String fileName = song.getSubmittedFileName();
         String dir = folder+owner+"/"+album.getArtist().getID()+"/"+album.getId()+"/";
         String filepath = dir + currentID;
         try {

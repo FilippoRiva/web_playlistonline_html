@@ -2,7 +2,6 @@ package com.playonline.controllers.files;
 
 import com.playonline.beans.User;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +21,7 @@ public class SongFile extends HttpServlet {
     }
 
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // auth check
         User user = (User) req.getSession().getAttribute("user");
         if(user==null){
@@ -61,7 +60,7 @@ public class SongFile extends HttpServlet {
         try(FileInputStream input = new FileInputStream(f)){
             OutputStream output = resp.getOutputStream();
             byte[] buffer = new byte[1024];
-            int count = 0;
+            int count;
             while((count=input.read(buffer))>=0){
                 output.write(buffer,0,count);
             }
