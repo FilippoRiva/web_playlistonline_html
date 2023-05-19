@@ -19,6 +19,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Objects;
@@ -38,11 +39,11 @@ public class HomePage extends HttpServlet {
         this.templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
         this.application = JavaxServletWebApplication.buildApplication(getServletContext());
         try{
-            this.playlistDAO = new PlaylistDAO(MySQLConnections.getConnection(getServletContext()));
-            this.albumDAO = new AlbumDAO(MySQLConnections.getConnection(getServletContext()),
-                    getServletContext().getInitParameter("filesDirectory"));
-            this.songDAO = new SongDAO(MySQLConnections.getConnection(getServletContext()),
-                    getServletContext().getInitParameter("filesDirectory"));
+            Connection connection = MySQLConnections.getConnection(getServletContext());
+            String filesDirectory = getServletContext().getInitParameter("filesDirectory");
+            this.playlistDAO = new PlaylistDAO(connection);
+            this.albumDAO = new AlbumDAO(connection, filesDirectory);
+            this.songDAO = new SongDAO(connection, filesDirectory);
         } catch (SQLException e){
             throw new RuntimeException(e);
         }
@@ -107,7 +108,7 @@ public class HomePage extends HttpServlet {
             }
         }
         try {
-            context.setVariable("artists",songDAO.getArtists(user.getUsername()));
+            context.setVariable("artists",playlistDAO.getArtists(user.getUsername()));
         } catch (SQLException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;

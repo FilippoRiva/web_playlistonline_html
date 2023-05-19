@@ -1,116 +1,24 @@
 @import url(style.css);
 @import url(artists-table.css);
 
-/*logout button*/
-.logout {
-    position: fixed;
-    top:15px;
-    right:15px;
-}
-
-/*playlist table*/
-.playlist-table{
-    position: relative;
+.playlist-table , .song-form, .playlist-form{
+    width: 70%;
     margin: auto;
-    max-width: 800px;
-    border: 3px solid dimgrey;
-    padding: 2%;
-    line-height: 1.1;
+    border: 1px solid white;
+    border-radius: 28px;
+    padding: 20px;
 }
 
-.playlist-table .row:not(:last-child) {
-    position: relative;
-    margin-bottom: 2%;
+input[type=text], input[type=select],select, input[type=date] {
+    width: 80%;
 }
 
-.playlist-table .row:last-child {
-    position: relative;
-}
 
-.playlist-table .row a:hover {
-    animation: 0.5 forwards 0.1s toGreenLink;
-}
-
-.playlist-table .row > .left{
-    display: inline-block;
-    width: 50%;
-}
-
-.playlist-table .row > .right{
-    display: inline-block;
-    text-align: right;
-    width: 33%;
-}
-
-/*song form*/
-.song-form {
-    position: relative;
-    margin: auto;
-    max-width: 800px;
-    padding: 2%;
-    border: 3px solid dimgray;
-}
-
-.song-form .row:not(:last-child) {
-    margin-bottom: 2%;
-    clear: both;
-}
-
-.song-form .album-switch-container {
-    position: relative;
-    max-width: 50%;
-    margin: 2% auto;
-}
-
-.album-switch-container .album-switch{
-    position: relative;
-    display: inline-block;
-    width: 100%;
-}
-
-.song-form .row > .left{
-    display: inline-block;
-    padding-left: 4% ;
-    text-align: right;
-    width: 20%;
-}
-
-.song-form .row > .right{
-    display: inline-block;
-    text-align: left;
-    width: 60%;
-}
-
-.song-form input[type="text"],input[type="date"]{
-    padding: 2px;
-}
-
-.song-form input[type="file"]{
+input[type=file], input[type=checkbox]{
     display: none;
 }
 
-.playlist-form {
+table {
     position: relative;
-    margin: auto;
-    max-width: 800px;
-    border: 3px solid dimgrey;
-    padding: 2%;
-    line-height: 1.1;
+    width: 100%;
 }
-
-.playlist-form .row {
-    margin-bottom: 2%;
-}
-.playlist-form .row > .left {
-    display: inline-block;
-    padding-left: 4%;
-    text-align: right;
-    width: 20%;
-}
-.playlist-form .row > .right {
-    display: inline-block;
-    text-align: left;
-    width: 60%;
-}
-
-

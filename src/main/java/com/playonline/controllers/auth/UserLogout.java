@@ -20,7 +20,7 @@ public class UserLogout extends HttpServlet {
         Cookie cookie = new Cookie("LOGIN_INFO","0");
         cookie.setMaxAge(0);
         resp.addCookie(cookie);
-        req.getSession(false).setAttribute("user",null);
+        req.getSession(true).setAttribute("user",null);
         resp.sendRedirect("/PlaylistOnline/login");
     }
 }

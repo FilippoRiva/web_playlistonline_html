@@ -109,7 +109,7 @@ public class SongCreate extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if(!song.getContentType().startsWith("audio/") || !cover.getContentType().startsWith("image/")){
+        if(!song.getContentType().startsWith("audio/") || (cover!=null && !cover.getContentType().startsWith("image/"))){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }

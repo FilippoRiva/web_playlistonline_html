@@ -14,7 +14,8 @@ public class PlaylistDAO {
     PreparedStatement addPlaylistStatement;
     PreparedStatement addSongToPlaylistStatement;
     PreparedStatement checkPlaylistExistenceStatement;
-    PreparedStatement getRemainingArtistsStatement;
+    PreparedStatement getRemainingUserArtistsStatement;
+    PreparedStatement getUserArtistsStatement;
     public PlaylistDAO(Connection connection) throws SQLException{
         String getUserPlaylistsQuery = "SELECT p_title,p_id,p_date FROM playlist WHERE p_owner=? ORDER BY p_date";
         String isPlaylistUserValid = "SELECT COUNT(*) FROM playlist WHERE p_owner=? AND p_ID=?";
@@ -31,21 +32,29 @@ public class PlaylistDAO {
         String checkPlaylistExistenceQuery = "SELECT p_title, p_date, p_ID FROM playlist WHERE p_ID=? and p_owner=?";
         String getRemainingArtistsQuery =
                 "SELECT s_ID, s_title, s_genre, a_ID, a_name, a_date, ar_name, ar_ID " +
-                "FROM song " +
-                "JOIN album a on a.a_ID = song.s_album_ID " +
-                "JOIN artist a2 on a2.ar_ID = a.a_artist_ID " +
-                "WHERE s_ID not in " +
-                "(SELECT s_ID " +
-                "FROM playlistsong " +
-                "JOIN playlist p on p.p_ID = playlistsong.p_ID " +
-                "WHERE p.p_owner=? and p.p_ID = ?)";
+                        "FROM song " +
+                        "JOIN album a on a.a_ID = song.s_album_ID " +
+                        "JOIN artist a2 on a2.ar_ID = a.a_artist_ID " +
+                        "WHERE s_owner = ? and s_ID not in " +
+                        "(SELECT s_ID " +
+                        "FROM playlistsong " +
+                        "JOIN playlist p on p.p_ID = playlistsong.p_ID " +
+                        "WHERE p.p_owner=? and p.p_ID = ?)";
+        String getUserSongs =
+                "SELECT ar_name, ar_ID, a_name, a_date, a_ID, s_title, s_genre, s_ID " +
+                        "FROM artist " +
+                        "JOIN album a on artist.ar_ID = a.a_artist_ID " +
+                        "JOIN song s on a.a_ID = s.s_album_ID " +
+                        "WHERE s_owner= ? " +
+                        "ORDER BY ar_name, a_name, s_title";
         getUserPlaylistsStatement = connection.prepareStatement(getUserPlaylistsQuery);
         isPlaylistUserCoupleValidStatement = connection.prepareStatement(isPlaylistUserValid);
         getPlaylistInfoStatement = connection.prepareStatement(getPlaylistInfoQuery);
         addPlaylistStatement = connection.prepareStatement(addPlaylistQuery,Statement.RETURN_GENERATED_KEYS);
         addSongToPlaylistStatement = connection.prepareStatement(addSongQuery);
         checkPlaylistExistenceStatement = connection.prepareStatement(checkPlaylistExistenceQuery);
-        getRemainingArtistsStatement = connection.prepareStatement(getRemainingArtistsQuery);
+        getRemainingUserArtistsStatement = connection.prepareStatement(getRemainingArtistsQuery);
+        getUserArtistsStatement = connection.prepareStatement(getUserSongs);
     }
 
     public List<Playlist> getUserPlaylists(String username) throws SQLException{
@@ -128,11 +137,20 @@ public class PlaylistDAO {
         return playlist;
     }
 
+    public List<Artist> getArtists(String username) throws SQLException {
+        getUserArtistsStatement.setString(1, username);
+        return getArtists(getUserArtistsStatement);
+    }
 
     public List<Artist> getRemainingArtists(int playlistID, String username) throws SQLException {
-        getRemainingArtistsStatement.setString(1,username);
-        getRemainingArtistsStatement.setInt(2,playlistID);
-        ResultSet result = getRemainingArtistsStatement.executeQuery();
+        getRemainingUserArtistsStatement.setString(1,username);
+        getRemainingUserArtistsStatement.setString(2,username);
+        getRemainingUserArtistsStatement.setInt(3,playlistID);
+        return getArtists(getRemainingUserArtistsStatement);
+    }
+
+    private List<Artist> getArtists(PreparedStatement getArtistsStatement) throws SQLException {
+        ResultSet result = getArtistsStatement.executeQuery();
         List<Artist> artists = new ArrayList<>();
         Artist currentArtist = new Artist();
         Album currentAlbum = new Album();
@@ -178,4 +196,5 @@ public class PlaylistDAO {
         artists.add(currentArtist);
         return artists;
     }
+
 }

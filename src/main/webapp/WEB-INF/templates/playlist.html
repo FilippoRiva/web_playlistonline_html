@@ -7,14 +7,16 @@
 </head>
 <body>
 
-<button class="button">
-    <a href="home">Home</a>
-</button>
+
+<div class="home" style="position:fixed; top: 10px; right: 10px">
+    <form th:align="left" action = "/PlaylistOnline/home" method = "post">
+        <input class="button" type="submit" value="Home">
+    </form>
+</div>
 <h1 th:text="${playlist.name}">Playlist</h1>
 <div class="song-navigation" th:if="${!emptyPlaylist}">
-    <div class="back" th:if="${prevPage!=0}">
-        <a th:href="@{/playlist(id=${param.id},page=${prevPage})}">Back</a>
-    </div>
+    <a class="back" th:if="${prevPage!=0}" th:href="@{/playlist(id=${param.id},page=${prevPage})}">&lt</a>
+    <div class="back" th:if="${prevPage==0}"></div>
     <div class="current-songs">
         <a  th:each="song : ${playlist.songs}" th:href="@{/song(id=${song.id},p=${playlist.id},page=${param.page})}">
         <div class="song-info" >
@@ -30,40 +32,46 @@
         </div>
         </a>
     </div>
-    <div class="next" th:if="${hasNext}">
-        <a th:href="@{/playlist(id=${param.id},page=${nextPage})}">
-            Next
-        </a>
-    </div>
+    <a  class="next" th:if="${hasNext}" th:href="@{/playlist(id=${param.id},page=${nextPage})}">&gt</a>
+    <div class="next" th:if="${!hasNext}"></div>
 </div>
 <div th:if="${emptyPlaylist}">
     No Songs
 </div>
+<h1>Add songs</h1>
 <div class="song-adder-container">
-    <form class="playlist-form" th:action = "@{/playlist-add(p_ID=${param.id},page=${param.page})}" method = "post" autocomplete="off">
-        <div th:if="${artists.size()==0}">
-            <br>No more songs to add<br>
-        </div>
-        <div class="artist-container" th:if="${artists.size()!=0}" >
-            <div class="artist" th:each="artist : ${artists}">
-                <div class="artist-text" th:text="${artist.name}">artist name</div>
-                <div class="artist-albums" >
-                    <div class="album" th:each="album : ${artist.albums}">
-                        <div class="album-title" th:text="${album.name}">album</div>
-                        <div class="album-songs" >
-                            <div class="song" th:each="song : ${album.songs}">
-                                <div class="song-title" th:text="${song.title}"> song title</div>
-                                <div class="song-checkbox">
-                                    <input type="checkbox" th:name="s_ID" th:value="${song.id}">
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+    <div class="centered-text" th:if="${artists.size()==0}">
+        <br>No more songs to add<br>
+    </div>
+    <form th:if="${artists.size()!=0}" class="playlist-form" th:action = "@{/playlist-add(p_ID=${param.id},page=${param.page})}" method = "post" autocomplete="off">
+        <table class="custom-table">
+            <div th:if="${artists.size()!=0}" >
+                <tr th:each="artist : ${artists}">
+                    <td class="artist-name" th:text="${artist.name}">artist name</td>
+                    <td>
+                        <table class="custom-table" th:each="album : ${artist.albums}">
+                            <tr>
+                                <td class="album-title" th:text="${album.name}">album</td>
+                                <td>
+                                    <table class="custom-table" >
+                                        <tr th:each="song : ${album.songs}">
+                                            <td class="checkbox-container">
+                                                <label>
+                                                    <input type="checkbox" th:name="s_ID" th:value="${song.id}"><span class="song-title" th:text="${song.title}"></span>
+                                                </label>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </table>
+                    </td>
+                </tr>
             </div>
-        </div>
-        <input class="button" type="submit" value="Create">
+        </table>
+        <input class="button" type="submit" value="Add">
     </form>
+
 </div>
 
 

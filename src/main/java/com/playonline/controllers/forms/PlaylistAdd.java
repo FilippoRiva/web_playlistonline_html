@@ -2,6 +2,7 @@ package com.playonline.controllers.forms;
 
 import com.playonline.beans.User;
 import com.playonline.dao.PlaylistDAO;
+import com.playonline.dao.SongDAO;
 import com.playonline.utils.MySQLConnections;
 
 import javax.servlet.ServletException;
@@ -10,6 +11,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Map;
 
@@ -17,10 +19,13 @@ import java.util.Map;
 public class PlaylistAdd extends HttpServlet {
 
     PlaylistDAO playlistDAO;
+    SongDAO songDAO;
     @Override
     public void init() throws ServletException {
         try {
-            playlistDAO = new PlaylistDAO(MySQLConnections.getConnection(getServletContext()));
+            Connection connection = MySQLConnections.getConnection(getServletContext());
+            playlistDAO = new PlaylistDAO(connection);
+            songDAO = new SongDAO(connection, "");
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -59,7 +64,7 @@ public class PlaylistAdd extends HttpServlet {
             for (String s_ID : songIDs) {
                 try {
                     int id = Integer.parseInt(s_ID);
-                    playlistDAO.addSongToPlaylist(p_ID, id);
+                    if(songDAO.isOwner(user.getUsername(),id))playlistDAO.addSongToPlaylist(p_ID, id);
                 } catch (NumberFormatException ignored) { //ignoring non parsable IDs
                 }
             }

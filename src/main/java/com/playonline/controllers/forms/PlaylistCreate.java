@@ -58,9 +58,8 @@ public class PlaylistCreate extends HttpServlet {
             if (songIDs != null) {
                 for (String s_ID : songIDs) {
                     try {
-                        //TODO check song ownership
                         int id = Integer.parseInt(s_ID);
-                        playlistDAO.addSongToPlaylist(p_ID, id);
+                        if(songDAO.isOwner(user.getUsername(),id)) playlistDAO.addSongToPlaylist(p_ID, id);
                     } catch (NumberFormatException ignored) { // ignoring non parsable IDs
                     }
                 }

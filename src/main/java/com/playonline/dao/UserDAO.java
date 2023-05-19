@@ -35,7 +35,7 @@ public class UserDAO {
         String newCookieVal;
         boolean alreadyExists;
         do {
-            //this generates only Strings of length 32
+            //this generates Strings of length 32
             UUID randomUUID = UUID.randomUUID();
             newCookieVal = randomUUID.toString();
             validCookieStatement.setString(1, newCookieVal);
