@@ -56,7 +56,6 @@ public class PlaylistAdd extends HttpServlet {
             resp.sendRedirect("/PlaylistOnline/playlist?id="+p_ID+"&page="+page);
             return;
         }
-        //TODO check songs and playlist ownership
 
         // database update
         String[] songIDs = parameters.get("s_ID");
@@ -72,7 +71,7 @@ public class PlaylistAdd extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        resp.sendRedirect("/PlaylistOnline/playlist?id="+p_ID+"&page="+page);
+        resp.sendRedirect("/PlaylistOnline/playlist?id="+p_ID+"&page=1");
     }
 
 }

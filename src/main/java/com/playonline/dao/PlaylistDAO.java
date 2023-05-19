@@ -17,7 +17,7 @@ public class PlaylistDAO {
     PreparedStatement getRemainingUserArtistsStatement;
     PreparedStatement getUserArtistsStatement;
     public PlaylistDAO(Connection connection) throws SQLException{
-        String getUserPlaylistsQuery = "SELECT p_title,p_id,p_date FROM playlist WHERE p_owner=? ORDER BY p_date";
+        String getUserPlaylistsQuery = "SELECT p_title,p_id,p_date FROM playlist WHERE p_owner=? ORDER BY p_date DESC";
         String isPlaylistUserValid = "SELECT COUNT(*) FROM playlist WHERE p_owner=? AND p_ID=?";
         String getPlaylistInfoQuery ="SELECT p_title,p_date,s.s_ID,a_ID,s_title,s_genre,a_name,ar_name, ar_ID ,a_date " +
                 "FROM playlist " +
