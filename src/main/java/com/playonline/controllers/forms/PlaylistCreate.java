@@ -18,7 +18,6 @@ import java.util.Map;
 
 @WebServlet("/playlist-create")
 public class PlaylistCreate extends HttpServlet {
-    PlaylistDAO playlistDAO;
     Connection connection;
     RequestDispatcher homeDispatcher;
     @Override
@@ -27,7 +26,6 @@ public class PlaylistCreate extends HttpServlet {
         try {
             this.connection = MySQLConnections.getConnection(getServletContext());
             connection.setAutoCommit(false);
-            this.playlistDAO = new PlaylistDAO(connection);
         } catch (SQLException e) {
             throw new RuntimeException(e);
         }
@@ -52,12 +50,14 @@ public class PlaylistCreate extends HttpServlet {
         Map<String,String[]> parameters = req.getParameterMap();
         String[] songIDs = parameters.get("s_ID");
         try {
+            PlaylistDAO playlistDAO = new PlaylistDAO(connection);
+            SongDAO songDAO = new SongDAO(connection,"");
             int p_ID = playlistDAO.createPlaylist(username, title);
             if (songIDs != null) {
                 for (String s_ID : songIDs) {
                     try {
                         int id = Integer.parseInt(s_ID);
-                        if(new SongDAO(connection,"").isOwner(user.getUsername(),id)) playlistDAO.addSongToPlaylist(p_ID, id);
+                        if(songDAO.isOwner(user.getUsername(),id)) playlistDAO.addSongToPlaylist(username,p_ID, id);
                     } catch (NumberFormatException ignored) { // ignoring non parsable IDs
                     }
                 }

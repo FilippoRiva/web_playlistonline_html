@@ -45,7 +45,7 @@ public class PlaylistAdd extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if(!parameters.containsKey("s_ID")){
+        if(!parameters.containsKey("s_ID")){ //doesn't contains songs
             resp.sendRedirect("/PlaylistOnline/playlist?id="+p_ID+"&page="+page);
             return;
         }
@@ -53,10 +53,12 @@ public class PlaylistAdd extends HttpServlet {
         // database update
         String[] songIDs = parameters.get("s_ID");
         try {
+            SongDAO songDAO = new SongDAO(connection,"");
+            PlaylistDAO playlistDAO = new PlaylistDAO(connection);
             for (String s_ID : songIDs) {
                 try {
                     int id = Integer.parseInt(s_ID);
-                    if(new SongDAO(connection,"").isOwner(user.getUsername(),id))new PlaylistDAO(connection).addSongToPlaylist(p_ID, id);
+                    if(songDAO.isOwner(user.getUsername(),id)) playlistDAO.addSongToPlaylist(user.getUsername(), p_ID, id);
                 } catch (NumberFormatException ignored) { //ignoring non parsable IDs
                 }
             }

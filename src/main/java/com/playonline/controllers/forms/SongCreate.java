@@ -104,7 +104,8 @@ public class SongCreate extends HttpServlet {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if(!song.getContentType().startsWith("audio/") || (cover!=null && !cover.getContentType().startsWith("image/"))){
+        if(song.getContentType()== null || !song.getContentType().startsWith("audio/") ||
+                (cover!=null && (cover.getContentType()==null || !cover.getContentType().startsWith("image/")))){
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -115,7 +116,7 @@ public class SongCreate extends HttpServlet {
         try {
             AlbumDAO albumDAO = new AlbumDAO(connection,filesDirectory);
             if(a_ID_str==null) {
-                artist = new ArtistDAO(connection).addArtist(user.getUsername(),ar_name);
+                artist = new ArtistDAO(connection).getArtist(user.getUsername(),ar_name);
                 album = albumDAO.addAlbum(a_name, artist, a_date, cover, user.getUsername());
             } else {
                 album = albumDAO.getAlbum(user.getUsername(),a_ID);

@@ -65,7 +65,8 @@ public class UserRegistration extends HttpServlet {
         // registration attempt
         String cookieVal;
         try {
-            if(!new UserDAO(connection).isUsernameAvailable(username)){
+            UserDAO userDAO = new UserDAO(connection);
+            if(!userDAO.isUsernameAvailable(username)){
                 req.setAttribute("username",username);
                 req.setAttribute("password",password);
                 req.setAttribute("passwordCopy",passwordCopy);
@@ -73,7 +74,6 @@ public class UserRegistration extends HttpServlet {
                 templateEngine.process("registration",context,resp.getWriter());
                 return;
             } else {
-                UserDAO userDAO = new UserDAO(connection);
                 cookieVal = userDAO.getNewCookie();
                 userDAO.addUser(username,password,cookieVal);
             }
