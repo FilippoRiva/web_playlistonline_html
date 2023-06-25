@@ -18,18 +18,18 @@ public class UserDAO {
         ResultSet result;
         String newCookieVal;
         boolean alreadyExists;
-        do {
-            String validCookieQuery = "SELECT COUNT(*) FROM user WHERE u_cookie=?";
-            try(PreparedStatement validCookieStatement = connection.prepareStatement(validCookieQuery)){
-                //this generates Strings of length 32
+        String validCookieQuery = "SELECT COUNT(*) FROM user WHERE u_cookie=?";
+        try(PreparedStatement validCookieStatement = connection.prepareStatement(validCookieQuery)){
+            do {
+                //this generates random Strings of length 32
                 UUID randomUUID = UUID.randomUUID();
                 newCookieVal = randomUUID.toString();
                 validCookieStatement.setString(1, newCookieVal);
                 result = validCookieStatement.executeQuery();
                 result.next();
                 alreadyExists = result.getInt(1) >= 1;
-            }
-        } while (alreadyExists);
+            } while (alreadyExists);
+        }
         return newCookieVal;
     }
 

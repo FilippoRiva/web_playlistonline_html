@@ -67,6 +67,7 @@ public class PlaylistDAO {
         }
     }
 
+    //returns just the 5+1 elements of a requested page
     public Playlist getPlaylistPage(int playlistID,String owner, int page) throws SQLException{
         String getPlaylistInfoQuery ="SELECT p_title,p_date,s.s_ID,a_ID,s_title,s_genre,a_name,ar_name, ar_ID ,a_date " +
                 "FROM playlist " +
