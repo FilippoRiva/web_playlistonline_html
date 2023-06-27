@@ -6,6 +6,7 @@ import java.sql.*;
 
 public class ArtistDAO {
     private final Connection connection;
+
     public ArtistDAO(Connection connection) throws SQLException {
         this.connection = connection;
     }
@@ -17,11 +18,11 @@ public class ArtistDAO {
                 "WHERE s_owner=?" +
                 "GROUP BY ar_ID";
         //existing artist
-        try(PreparedStatement getArtistByUsernameStatement = connection.prepareStatement(getArtistByUsername)){
-            getArtistByUsernameStatement.setString(1,username);
+        try (PreparedStatement getArtistByUsernameStatement = connection.prepareStatement(getArtistByUsername)) {
+            getArtistByUsernameStatement.setString(1, username);
             ResultSet result = getArtistByUsernameStatement.executeQuery();
-            while(result.next()){
-                if(result.getString("ar_name").equals(arName)) {
+            while (result.next()) {
+                if (result.getString("ar_name").equals(arName)) {
                     Artist artist = new Artist();
                     artist.setName(result.getString("ar_name"));
                     artist.setID(result.getInt("ar_ID"));
@@ -31,8 +32,8 @@ public class ArtistDAO {
         }
         //new artist
         String addArtistQuery = "INSERT INTO artist(ar_name) VALUES(?)";
-        try(PreparedStatement addArtistStatement = connection.prepareStatement(addArtistQuery,Statement.RETURN_GENERATED_KEYS)){
-            addArtistStatement.setString(1,arName);
+        try (PreparedStatement addArtistStatement = connection.prepareStatement(addArtistQuery, Statement.RETURN_GENERATED_KEYS)) {
+            addArtistStatement.setString(1, arName);
             addArtistStatement.executeUpdate();
             ResultSet result = addArtistStatement.getGeneratedKeys();
             result.next();

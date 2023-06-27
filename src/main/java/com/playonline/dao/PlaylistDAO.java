@@ -9,18 +9,19 @@ import java.util.List;
 
 public class PlaylistDAO {
     private final Connection connection;
-    public PlaylistDAO(Connection connection) throws SQLException{
+
+    public PlaylistDAO(Connection connection) throws SQLException {
         this.connection = connection;
     }
 
-    public List<Playlist> getUserPlaylists(String username) throws SQLException{
+    public List<Playlist> getUserPlaylists(String username) throws SQLException {
         String getUserPlaylistsQuery = "SELECT p_title,p_id,p_date FROM playlist WHERE p_owner=? ORDER BY p_date DESC";
-        try(PreparedStatement getUserPlaylistsStatement = connection.prepareStatement(getUserPlaylistsQuery)){
+        try (PreparedStatement getUserPlaylistsStatement = connection.prepareStatement(getUserPlaylistsQuery)) {
             List<Playlist> result = new ArrayList<>();
             ResultSet queryResult;
-            getUserPlaylistsStatement.setString(1,username);
+            getUserPlaylistsStatement.setString(1, username);
             queryResult = getUserPlaylistsStatement.executeQuery();
-            while(queryResult.next()){
+            while (queryResult.next()) {
                 Playlist playlist = new Playlist();
                 playlist.setName(queryResult.getString(1));
                 playlist.setId(queryResult.getInt(2));
@@ -31,12 +32,12 @@ public class PlaylistDAO {
         }
     }
 
-    public boolean isOwner (String username, int playlistID) throws SQLException{
+    public boolean isOwner(String username, int playlistID) throws SQLException {
         String isOwnerQuery = "SELECT COUNT(*) FROM playlist WHERE p_owner=? and p_id=?";
-        try(PreparedStatement getUserPlaylistsStatement = connection.prepareStatement(isOwnerQuery)){
+        try (PreparedStatement getUserPlaylistsStatement = connection.prepareStatement(isOwnerQuery)) {
             ResultSet queryResult;
-            getUserPlaylistsStatement.setString(1,username);
-            getUserPlaylistsStatement.setInt(2,playlistID);
+            getUserPlaylistsStatement.setString(1, username);
+            getUserPlaylistsStatement.setInt(2, playlistID);
             queryResult = getUserPlaylistsStatement.executeQuery();
             queryResult.next();
             int count = queryResult.getInt(1);
@@ -46,10 +47,10 @@ public class PlaylistDAO {
 
     public int createPlaylist(String username, String playlistName) throws SQLException {
         String addPlaylistQuery = "INSERT INTO playlist(p_owner,p_title,p_date) VALUES (?,?,?)";
-        try(PreparedStatement addPlaylistStatement = connection.prepareStatement(addPlaylistQuery,Statement.RETURN_GENERATED_KEYS)){
-            addPlaylistStatement.setString(1,username);
-            addPlaylistStatement.setString(2,playlistName);
-            addPlaylistStatement.setDate(3,new Date(System.currentTimeMillis()));
+        try (PreparedStatement addPlaylistStatement = connection.prepareStatement(addPlaylistQuery, Statement.RETURN_GENERATED_KEYS)) {
+            addPlaylistStatement.setString(1, username);
+            addPlaylistStatement.setString(2, playlistName);
+            addPlaylistStatement.setDate(3, new Date(System.currentTimeMillis()));
             addPlaylistStatement.executeUpdate();
             ResultSet result = addPlaylistStatement.getGeneratedKeys();
             result.next();
@@ -58,18 +59,18 @@ public class PlaylistDAO {
     }
 
     public void addSongToPlaylist(String username, int pId, int sId) throws SQLException {
-        if(!isOwner(username,pId)) return;
+        if (!isOwner(username, pId)) return;
         String addSongQuery = "INSERT INTO playlistsong(s_ID,p_ID) VALUES(?,?)";
-        try(PreparedStatement addSongToPlaylistStatement = connection.prepareStatement(addSongQuery)){
-            addSongToPlaylistStatement.setInt(1,sId);
-            addSongToPlaylistStatement.setInt(2,pId);
+        try (PreparedStatement addSongToPlaylistStatement = connection.prepareStatement(addSongQuery)) {
+            addSongToPlaylistStatement.setInt(1, sId);
+            addSongToPlaylistStatement.setInt(2, pId);
             addSongToPlaylistStatement.executeUpdate();
         }
     }
 
     //returns just the 5+1 elements of a requested page
-    public Playlist getPlaylistPage(int playlistID,String owner, int page) throws SQLException{
-        String getPlaylistInfoQuery ="SELECT p_title,p_date,s.s_ID,a_ID,s_title,s_genre,a_name,ar_name, ar_ID ,a_date " +
+    public Playlist getPlaylistPage(int playlistID, String owner, int page) throws SQLException {
+        String getPlaylistInfoQuery = "SELECT p_title,p_date,s.s_ID,a_ID,s_title,s_genre,a_name,ar_name, ar_ID ,a_date " +
                 "FROM playlist " +
                 "LEFT JOIN playlistsong p on playlist.p_ID = p.p_ID " +
                 "JOIN song s on s.s_ID = p.s_ID " +
@@ -78,20 +79,20 @@ public class PlaylistDAO {
                 "WHERE playlist.p_ID=? AND playlist.p_owner=?" +
                 "ORDER BY a_date DESC, ps_position ASC " +
                 "LIMIT 6 OFFSET ?";
-        try(PreparedStatement getPlaylistInfoStatement = connection.prepareStatement(getPlaylistInfoQuery)){
+        try (PreparedStatement getPlaylistInfoStatement = connection.prepareStatement(getPlaylistInfoQuery)) {
             Playlist playlist = new Playlist();
             ResultSet queryResult;
-            getPlaylistInfoStatement.setInt(1,playlistID);
-            getPlaylistInfoStatement.setString(2,owner);
-            getPlaylistInfoStatement.setInt(3,(page-1)*5);
+            getPlaylistInfoStatement.setInt(1, playlistID);
+            getPlaylistInfoStatement.setString(2, owner);
+            getPlaylistInfoStatement.setInt(3, (page - 1) * 5);
             queryResult = getPlaylistInfoStatement.executeQuery();
-            if(!queryResult.next()){ //empty playlist
+            if (!queryResult.next()) { //empty playlist
                 String checkPlaylistExistenceQuery = "SELECT p_title, p_date, p_ID FROM playlist WHERE p_ID=? and p_owner=?";
-                try(PreparedStatement checkPlaylistExistenceStatement = connection.prepareStatement(checkPlaylistExistenceQuery)){
-                    checkPlaylistExistenceStatement.setInt(1,playlistID);
-                    checkPlaylistExistenceStatement.setString(2,owner);
+                try (PreparedStatement checkPlaylistExistenceStatement = connection.prepareStatement(checkPlaylistExistenceQuery)) {
+                    checkPlaylistExistenceStatement.setInt(1, playlistID);
+                    checkPlaylistExistenceStatement.setString(2, owner);
                     queryResult = checkPlaylistExistenceStatement.executeQuery();
-                    if(!queryResult.next()) return null;
+                    if (!queryResult.next()) return null;
                     playlist.setName(queryResult.getString("p_title"));
                     playlist.setId(queryResult.getInt("p_ID"));
                     playlist.setDate(new Date(queryResult.getDate("p_date").getTime()));
@@ -102,7 +103,7 @@ public class PlaylistDAO {
             playlist.setId(playlistID);
             playlist.setDate(new Date(queryResult.getDate("p_date").getTime()));
             List<Song> songs = new ArrayList<>();
-            do{
+            do {
                 Song song = new Song();
                 song.setId(queryResult.getInt("s_ID"));
                 song.setTitle(queryResult.getString("s_title"));
@@ -120,7 +121,7 @@ public class PlaylistDAO {
                 album.setArtist(artist);
                 song.setAlbum(album);
                 songs.add(song);
-            }while(queryResult.next());
+            } while (queryResult.next());
             playlist.setSongs(songs);
             return playlist;
         }
@@ -134,7 +135,7 @@ public class PlaylistDAO {
                         "JOIN song s on a.a_ID = s.s_album_ID " +
                         "WHERE s_owner= ? " +
                         "ORDER BY ar_name, a_name, s_title";
-        try(PreparedStatement getUserArtistsStatement = connection.prepareStatement(getUserSongs)){
+        try (PreparedStatement getUserArtistsStatement = connection.prepareStatement(getUserSongs)) {
             getUserArtistsStatement.setString(1, username);
             return getArtists(getUserArtistsStatement);
         }
@@ -151,10 +152,10 @@ public class PlaylistDAO {
                         "FROM playlistsong " +
                         "JOIN playlist p on p.p_ID = playlistsong.p_ID " +
                         "WHERE p.p_owner=? and p.p_ID = ?)";
-        try(PreparedStatement getRemainingUserArtistsStatement = connection.prepareStatement(getRemainingArtistsQuery)){
-            getRemainingUserArtistsStatement.setString(1,username);
-            getRemainingUserArtistsStatement.setString(2,username);
-            getRemainingUserArtistsStatement.setInt(3,playlistID);
+        try (PreparedStatement getRemainingUserArtistsStatement = connection.prepareStatement(getRemainingArtistsQuery)) {
+            getRemainingUserArtistsStatement.setString(1, username);
+            getRemainingUserArtistsStatement.setString(2, username);
+            getRemainingUserArtistsStatement.setInt(3, playlistID);
             return getArtists(getRemainingUserArtistsStatement);
         }
     }
@@ -167,11 +168,11 @@ public class PlaylistDAO {
         List<Album> currentAlbums = new ArrayList<>();
         Song currentSong;
         List<Song> currentSongs = new ArrayList<>();
-        if(!result.next()) return artists;
+        if (!result.next()) return artists;
         do {
             //artist changes
-            if(currentArtist.getName()==null || currentArtist.getID()!=result.getInt("ar_ID")) {
-                if(currentArtist.getName()!=null) {
+            if (currentArtist.getName() == null || currentArtist.getID() != result.getInt("ar_ID")) {
+                if (currentArtist.getName() != null) {
                     currentArtist.setAlbums(currentAlbums);
                     currentAlbums = new ArrayList<>();
                     artists.add(currentArtist);
@@ -181,10 +182,10 @@ public class PlaylistDAO {
                 currentArtist.setName(result.getString("ar_name"));
             }
             //album changes
-            if(currentAlbum.getName()==null || currentAlbum.getId()!= result.getInt("a_ID")){
+            if (currentAlbum.getName() == null || currentAlbum.getId() != result.getInt("a_ID")) {
                 currentAlbum.setSongs(currentSongs);
                 currentSongs = new ArrayList<>();
-                currentAlbum= new Album();
+                currentAlbum = new Album();
                 currentAlbum.setId(result.getInt("a_ID"));
                 currentAlbum.setArtist(currentArtist);
                 currentAlbum.setDate(new Date(result.getDate("a_date").getTime()));
@@ -200,7 +201,7 @@ public class PlaylistDAO {
             genre.setName(result.getString("s_genre"));
             currentSong.setGenre(genre);
             currentSongs.add(currentSong);
-        } while(result.next());
+        } while (result.next());
         currentAlbum.setSongs(currentSongs);
         currentArtist.setAlbums(currentAlbums);
         artists.add(currentArtist);

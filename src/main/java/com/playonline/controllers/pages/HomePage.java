@@ -39,32 +39,33 @@ public class HomePage extends HttpServlet {
         this.connection = MySQLConnections.getConnection(getServletContext());
         this.filesDirectory = getServletContext().getInitParameter("filesDirectory");
     }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // auth check
         User user = (User) req.getSession().getAttribute("user");
-        if(user == null) {
+        if (user == null) {
             resp.sendRedirect("/PlaylistOnline/login");
             return;
         }
 
         // input parsing
         Object addingNewAlbum = req.getAttribute("addingNewAlbum");
-        if(addingNewAlbum==null) {
+        if (addingNewAlbum == null) {
             String att = req.getParameter("a");
-            if(att!=null){
-                addingNewAlbum =Boolean.parseBoolean(att);
-                req.setAttribute("addingNewAlbum",addingNewAlbum);
+            if (att != null) {
+                addingNewAlbum = Boolean.parseBoolean(att);
+                req.setAttribute("addingNewAlbum", addingNewAlbum);
             }
         }
 
         // keeping genre input
         String s_genre = req.getParameter("s_genre");
-        int selectedId=0;
-        if(s_genre!=null){
-            for(GenreEnum g : GenreEnum.values()){
-                if(Objects.equals(g.getName(), s_genre)){
-                    selectedId=g.getId();
+        int selectedId = 0;
+        if (s_genre != null) {
+            for (GenreEnum g : GenreEnum.values()) {
+                if (Objects.equals(g.getName(), s_genre)) {
+                    selectedId = g.getId();
                 }
             }
         }
@@ -78,21 +79,20 @@ public class HomePage extends HttpServlet {
         }
 
         // page templating
-        IWebExchange webExchange = application.buildExchange(req,resp);
+        IWebExchange webExchange = application.buildExchange(req, resp);
         WebContext context = new WebContext(webExchange);
-        context.setVariable("playlists",playlists);
+        context.setVariable("playlists", playlists);
         context.setVariable("adding", false);
-        context.setVariable("genres",GenreEnum.values());
-        if(addingNewAlbum!=null) {
+        context.setVariable("genres", GenreEnum.values());
+        if (addingNewAlbum != null) {
             context.setVariable("adding", true);
             boolean b = (boolean) addingNewAlbum;
-            if(b) {
-                context.setVariable("newAlbum",true);
-            }
-            else {
-                context.setVariable("newAlbum",false);
+            if (b) {
+                context.setVariable("newAlbum", true);
+            } else {
+                context.setVariable("newAlbum", false);
                 try {
-                    context.setVariable("albums",new AlbumDAO(connection,filesDirectory).getUserAlbums(user.getUsername()));
+                    context.setVariable("albums", new AlbumDAO(connection, filesDirectory).getUserAlbums(user.getUsername()));
                 } catch (SQLException e) {
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     return;
@@ -100,23 +100,23 @@ public class HomePage extends HttpServlet {
             }
         }
         try {
-            context.setVariable("artists",new PlaylistDAO(connection).getArtists(user.getUsername()));
+            context.setVariable("artists", new PlaylistDAO(connection).getArtists(user.getUsername()));
         } catch (SQLException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
-        context.setVariable("selectedId",selectedId);
-        templateEngine.process("home",context,resp.getWriter());
+        context.setVariable("selectedId", selectedId);
+        templateEngine.process("home", context, resp.getWriter());
     }
 
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String att = req.getParameter("a");
-        if(att!=null) {
+        if (att != null) {
             boolean addingNewAlbum;
             addingNewAlbum = Boolean.parseBoolean(att);
             req.setAttribute("addingNewAlbum", addingNewAlbum);
         }
-        doGet(req,resp);
+        doGet(req, resp);
     }
 }

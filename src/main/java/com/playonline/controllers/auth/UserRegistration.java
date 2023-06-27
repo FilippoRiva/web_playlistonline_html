@@ -22,6 +22,7 @@ public class UserRegistration extends HttpServlet {
     TemplateEngine templateEngine;
     JavaxServletWebApplication application;
     Connection connection;
+
     @Override
     public void init() {
         templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
@@ -31,8 +32,8 @@ public class UserRegistration extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
-        IWebContext context = new WebContext(application.buildExchange(req,resp));
-        templateEngine.process("registration",context,resp.getWriter());
+        IWebContext context = new WebContext(application.buildExchange(req, resp));
+        templateEngine.process("registration", context, resp.getWriter());
     }
 
     @Override
@@ -40,50 +41,50 @@ public class UserRegistration extends HttpServlet {
         String username = req.getParameter("username");
         String password = req.getParameter("password");
         String passwordCopy = req.getParameter("passwordCopy");
-        WebContext context = new WebContext(application.buildExchange(req,resp));
+        WebContext context = new WebContext(application.buildExchange(req, resp));
         // input parsing
-        if(username==null || username.length()<1 || username.length()>30) {
-            context.setVariable("usernameInvalid",true);
-            req.setAttribute("password",password);
-            req.setAttribute("passwordCopy",passwordCopy);
-            templateEngine.process("registration",context,resp.getWriter());
+        if (username == null || username.length() < 1 || username.length() > 30) {
+            context.setVariable("usernameInvalid", true);
+            req.setAttribute("password", password);
+            req.setAttribute("passwordCopy", passwordCopy);
+            templateEngine.process("registration", context, resp.getWriter());
             return;
         }
-        if(password==null || password.length()<5 || password.length()>100){
-            req.setAttribute("username",username);
-            context.setVariable("passwordInvalid",true);
-            templateEngine.process("registration",context,resp.getWriter());
+        if (password == null || password.length() < 5 || password.length() > 100) {
+            req.setAttribute("username", username);
+            context.setVariable("passwordInvalid", true);
+            templateEngine.process("registration", context, resp.getWriter());
             return;
         }
-        if(passwordCopy==null || password.compareTo(passwordCopy)!=0){
-            req.setAttribute("username",username);
-            req.setAttribute("password",password);
-            context.setVariable("passwordCopyInvalid",true);
-            templateEngine.process("registration",context,resp.getWriter());
+        if (passwordCopy == null || password.compareTo(passwordCopy) != 0) {
+            req.setAttribute("username", username);
+            req.setAttribute("password", password);
+            context.setVariable("passwordCopyInvalid", true);
+            templateEngine.process("registration", context, resp.getWriter());
             return;
         }
         // registration attempt
         String cookieVal;
         try {
             UserDAO userDAO = new UserDAO(connection);
-            if(!userDAO.isUsernameAvailable(username)){
-                req.setAttribute("username",username);
-                req.setAttribute("password",password);
-                req.setAttribute("passwordCopy",passwordCopy);
-                context.setVariable("usernameUnavailable",true);
-                templateEngine.process("registration",context,resp.getWriter());
+            if (!userDAO.isUsernameAvailable(username)) {
+                req.setAttribute("username", username);
+                req.setAttribute("password", password);
+                req.setAttribute("passwordCopy", passwordCopy);
+                context.setVariable("usernameUnavailable", true);
+                templateEngine.process("registration", context, resp.getWriter());
                 return;
             } else {
                 cookieVal = userDAO.getNewCookie();
-                userDAO.addUser(username,password,cookieVal);
+                userDAO.addUser(username, password, cookieVal);
             }
         } catch (SQLException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
         // auth cookie
-        Cookie newCookie = new Cookie("LOGIN_INFO",cookieVal);
-        newCookie.setMaxAge(60*60*24*365);
+        Cookie newCookie = new Cookie("LOGIN_INFO", cookieVal);
+        newCookie.setMaxAge(60 * 60 * 24 * 365);
         resp.addCookie(newCookie);
         resp.sendRedirect("/PlaylistOnline/login");
     }

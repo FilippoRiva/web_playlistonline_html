@@ -25,8 +25,9 @@ public class PlaylistPage extends HttpServlet {
     TemplateEngine templateEngine;
     JavaxServletWebApplication application;
     Connection connection;
+
     @Override
-    public void init(){
+    public void init() {
         this.templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
         this.application = JavaxServletWebApplication.buildApplication(getServletContext());
         this.connection = MySQLConnections.getConnection(getServletContext());
@@ -51,8 +52,8 @@ public class PlaylistPage extends HttpServlet {
         try {
             p_ID = Integer.parseInt(p_ID_str);
             page = Integer.parseInt(page_str);
-            prevPage = page-1;
-            nextPage = page+1;
+            prevPage = page - 1;
+            nextPage = page + 1;
         } catch (NumberFormatException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -66,23 +67,22 @@ public class PlaylistPage extends HttpServlet {
         try {
             PlaylistDAO playlistDAO = new PlaylistDAO(connection);
             playlist = playlistDAO.getPlaylistPage(p_ID, user.getUsername(), page);
-            if(playlist==null){
+            if (playlist == null) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-            remainingArtists = playlistDAO.getRemainingArtists(p_ID,user.getUsername());
-            if(playlist.getSongs()==null){
+            remainingArtists = playlistDAO.getRemainingArtists(p_ID, user.getUsername());
+            if (playlist.getSongs() == null) {
                 empty = true;
-            }
-            else if(playlist.getSongs().size()==6){
-                playlist.setSongs(playlist.getSongs().subList(0,5));
+            } else if (playlist.getSongs().size() == 6) {
+                playlist.setSongs(playlist.getSongs().subList(0, 5));
                 hasNext = true;
             }
         } catch (SQLException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
-        IWebExchange webExchange = application.buildExchange(req,resp);
+        IWebExchange webExchange = application.buildExchange(req, resp);
         WebContext context = new WebContext(webExchange);
         context.setVariable("playlist", playlist);
         context.setVariable("artists", remainingArtists);

@@ -20,8 +20,9 @@ import java.util.Map;
 public class PlaylistCreate extends HttpServlet {
     Connection connection;
     RequestDispatcher homeDispatcher;
+
     @Override
-    public void init(){
+    public void init() {
         homeDispatcher = getServletContext().getRequestDispatcher("/home");
         this.connection = MySQLConnections.getConnection(getServletContext());
         try {
@@ -34,30 +35,30 @@ public class PlaylistCreate extends HttpServlet {
     @Override
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         // auth check
-        User user = (User)req.getSession().getAttribute("user");
-        if(user==null){
+        User user = (User) req.getSession().getAttribute("user");
+        if (user == null) {
             resp.sendRedirect("login");
             return;
         }
         // input parsing
         String title = req.getParameter("p_title");
         String username = user.getUsername();
-        if(title==null || title.equals("")){
-            homeDispatcher.forward(req,resp);
+        if (title == null || title.equals("")) {
+            homeDispatcher.forward(req, resp);
             return;
         }
         // database update
-        Map<String,String[]> parameters = req.getParameterMap();
+        Map<String, String[]> parameters = req.getParameterMap();
         String[] songIDs = parameters.get("s_ID");
         try {
             PlaylistDAO playlistDAO = new PlaylistDAO(connection);
-            SongDAO songDAO = new SongDAO(connection,"");
+            SongDAO songDAO = new SongDAO(connection, "");
             int p_ID = playlistDAO.createPlaylist(username, title);
             if (songIDs != null) {
                 for (String s_ID : songIDs) {
                     try {
                         int id = Integer.parseInt(s_ID);
-                        if(songDAO.isOwner(user.getUsername(),id)) playlistDAO.addSongToPlaylist(username,p_ID, id);
+                        if (songDAO.isOwner(user.getUsername(), id)) playlistDAO.addSongToPlaylist(username, p_ID, id);
                     } catch (NumberFormatException ignored) { // ignoring non parsable IDs
                     }
                 }

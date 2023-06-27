@@ -35,16 +35,16 @@ public class SongPage extends HttpServlet {
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // auth check
         User user = (User) req.getSession().getAttribute("user");
-        if(user==null){
+        if (user == null) {
             resp.sendRedirect("login");
             return;
         }
         // input parsing
         String id_str = req.getParameter("id");
         int id;
-        try{
+        try {
             id = Integer.parseInt(id_str);
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -52,18 +52,18 @@ public class SongPage extends HttpServlet {
         // page templating
         Song song;
         try {
-            song = new SongDAO(connection,getInitParameter("filesDirectory")).getSongByID(id, user.getUsername());
+            song = new SongDAO(connection, getInitParameter("filesDirectory")).getSongByID(id, user.getUsername());
         } catch (SQLException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             return;
         }
-        if(song==null){
+        if (song == null) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        IWebExchange webExchange = application.buildExchange(req,resp);
+        IWebExchange webExchange = application.buildExchange(req, resp);
         WebContext context = new WebContext(webExchange);
-        context.setVariable("song",song);
-        templateEngine.process("song",context,resp.getWriter());
+        context.setVariable("song", song);
+        templateEngine.process("song", context, resp.getWriter());
     }
 }

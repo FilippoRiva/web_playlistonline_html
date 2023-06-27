@@ -19,6 +19,7 @@ import java.util.Map;
 public class PlaylistAdd extends HttpServlet {
 
     Connection connection;
+
     @Override
     public void init() throws ServletException {
         this.connection = MySQLConnections.getConnection(getServletContext());
@@ -33,51 +34,52 @@ public class PlaylistAdd extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // auth check
         User user = (User) req.getSession().getAttribute("user");
-        if(user == null){
+        if (user == null) {
             resp.sendRedirect("login");
             return;
         }
         // input parsing
-        Map<String,String[]> parameters = req.getParameterMap();
+        Map<String, String[]> parameters = req.getParameterMap();
         String playlistID = req.getParameter("p_ID");
         String pageString = req.getParameter("page");
         int p_ID;
         int page;
-        try{
+        try {
             p_ID = Integer.parseInt(playlistID);
             page = Integer.parseInt(pageString);
-        } catch (NumberFormatException e){
+        } catch (NumberFormatException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if(!parameters.containsKey("s_ID")){ //doesn't contains songs
-            resp.sendRedirect("/PlaylistOnline/playlist?id="+p_ID+"&page="+page);
+        if (!parameters.containsKey("s_ID")) { //doesn't contains songs
+            resp.sendRedirect("/PlaylistOnline/playlist?id=" + p_ID + "&page=" + page);
             return;
         }
 
         // database update
         String[] songIDs = parameters.get("s_ID");
         try {
-            SongDAO songDAO = new SongDAO(connection,"");
+            SongDAO songDAO = new SongDAO(connection, "");
             PlaylistDAO playlistDAO = new PlaylistDAO(connection);
             for (String s_ID : songIDs) {
                 try {
                     int id = Integer.parseInt(s_ID);
-                    if(songDAO.isOwner(user.getUsername(),id)) playlistDAO.addSongToPlaylist(user.getUsername(), p_ID, id);
+                    if (songDAO.isOwner(user.getUsername(), id))
+                        playlistDAO.addSongToPlaylist(user.getUsername(), p_ID, id);
                 } catch (NumberFormatException ignored) { //ignoring non parsable IDs
                 }
             }
             connection.commit();
         } catch (SQLException e) {
-            try{
+            try {
                 connection.rollback();
-            } catch (SQLException ex){
+            } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        resp.sendRedirect("/PlaylistOnline/playlist?id="+p_ID+"&page=1");
+        resp.sendRedirect("/PlaylistOnline/playlist?id=" + p_ID + "&page=1");
     }
 
 }

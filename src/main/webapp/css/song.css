@@ -22,7 +22,7 @@
 }
 
 .album-cover {
-    margin:20px;
+    margin: 20px;
     flex-shrink: 0;
     flex-grow: 0;
 }
@@ -38,6 +38,7 @@
     overflow: hidden;
     border: 20px;
 }
+
 .song-info {
     height: 80%;
     width: 100%;

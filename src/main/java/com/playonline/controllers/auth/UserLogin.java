@@ -19,14 +19,14 @@ import java.io.IOException;
 import java.sql.*;
 
 @WebServlet("/login")
-public class UserLogin extends HttpServlet{
+public class UserLogin extends HttpServlet {
 
     private TemplateEngine templateEngine;
     private JavaxServletWebApplication application;
     private Connection connection;
 
     @Override
-    public void init(){
+    public void init() {
         ServletContext context = getServletContext();
 
         this.templateEngine = TemplateEngines.getTemplateEngine(getServletContext());
@@ -34,12 +34,13 @@ public class UserLogin extends HttpServlet{
 
         this.connection = MySQLConnections.getConnection(context);
     }
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         // auth cookie check
         Cookie[] cookies = req.getCookies();
-        if(cookies==null) {
-            loginProcess(req,resp,true);
+        if (cookies == null) {
+            loginProcess(req, resp, true);
             return;
         }
         for (Cookie c : cookies) {
@@ -51,13 +52,13 @@ public class UserLogin extends HttpServlet{
                     resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
                     return;
                 }
-                if(user == null) break;
+                if (user == null) break;
                 req.getSession(true).setAttribute("user", user);
                 resp.sendRedirect("/PlaylistOnline/home");
                 return;
             }
         }
-        loginProcess(req,resp,true);
+        loginProcess(req, resp, true);
     }
 
     @Override
@@ -65,32 +66,32 @@ public class UserLogin extends HttpServlet{
         // input parsing
         String username = req.getParameter("username");
         String password = req.getParameter("password");
-        if(username==null || password==null || password.length()<5){
-            loginProcess(req,resp,false);
+        if (username == null || password == null || password.length() < 5) {
+            loginProcess(req, resp, false);
             return;
         }
         // validity check
         User user = null;
         try {
-            user = new UserDAO(connection).checkCredentials(username,password);
+            user = new UserDAO(connection).checkCredentials(username, password);
         } catch (SQLException e) {
             resp.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
-        if(user==null){
-            loginProcess(req,resp,false);
+        if (user == null) {
+            loginProcess(req, resp, false);
             return;
         }
         // new auth cookie
-        req.getSession(true).setAttribute("user",user);
-        Cookie cookie = new Cookie("LOGIN_INFO",user.getCookie());
-        cookie.setMaxAge(60*60*24*365);
+        req.getSession(true).setAttribute("user", user);
+        Cookie cookie = new Cookie("LOGIN_INFO", user.getCookie());
+        cookie.setMaxAge(60 * 60 * 24 * 365);
         resp.addCookie(cookie);
         resp.sendRedirect("/PlaylistOnline/home");
     }
 
     public void loginProcess(HttpServletRequest req, HttpServletResponse resp, boolean valid) throws IOException {
-        WebContext ctx = new WebContext(application.buildExchange(req,resp));
-        ctx.setVariable("invalid",!valid);
-        templateEngine.process("login",ctx,resp.getWriter());
+        WebContext ctx = new WebContext(application.buildExchange(req, resp));
+        ctx.setVariable("invalid", !valid);
+        templateEngine.process("login", ctx, resp.getWriter());
     }
 }

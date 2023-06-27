@@ -35,7 +35,7 @@ public class SongCreate extends HttpServlet {
     String filesDirectory;
 
     @Override
-    public void init(){
+    public void init() {
         this.connection = MySQLConnections.getConnection(getServletContext());
         this.filesDirectory = getServletContext().getInitParameter("filesDirectory");
         try {
@@ -56,7 +56,7 @@ public class SongCreate extends HttpServlet {
     protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         //auth check
         User user = (User) req.getSession().getAttribute("user");
-        if(req.getSession().getAttribute("user")==null) {
+        if (req.getSession().getAttribute("user") == null) {
             resp.sendRedirect("login");
             return;
         }
@@ -69,19 +69,19 @@ public class SongCreate extends HttpServlet {
         String a_ID_str = req.getParameter("a_ID");
         String ar_name = req.getParameter("ar_name");
         String a_date_str = req.getParameter("a_date");
-        if(a_ID_str==null && (song.getSize()==0 || s_title == null || s_title.equals("") ||
-                a_name==null || a_name.equals("") || ar_name==null || ar_name.equals("") ||
-                a_date_str.equals("") || cover.getSize()==0 || s_genre==null || s_genre.equals("none"))){
-            homeATrue.forward(req,resp);
+        if (a_ID_str == null && (song.getSize() == 0 || s_title == null || s_title.equals("") ||
+                a_name == null || a_name.equals("") || ar_name == null || ar_name.equals("") ||
+                a_date_str.equals("") || cover.getSize() == 0 || s_genre == null || s_genre.equals("none"))) {
+            homeATrue.forward(req, resp);
             return;
         }
-        if( a_ID_str!=null && (song.getSize()==0 || s_title == null || s_title.equals("") || s_genre==null || s_genre.equals("none"))){
-            homeAFalse.forward(req,resp);
+        if (a_ID_str != null && (song.getSize() == 0 || s_title == null || s_title.equals("") || s_genre == null || s_genre.equals("none"))) {
+            homeAFalse.forward(req, resp);
             return;
         }
         int a_ID = -1;
         Date a_date = null;
-        if(a_ID_str==null){
+        if (a_ID_str == null) {
             try {
                 a_date = new SimpleDateFormat("yyyy-dd-MM").parse(a_date_str);
             } catch (ParseException e) {
@@ -89,10 +89,10 @@ public class SongCreate extends HttpServlet {
                 return;
             }
         }
-        if(a_ID_str!=null){
+        if (a_ID_str != null) {
             try {
                 a_ID = Integer.parseInt(a_ID_str);
-            }catch (NumberFormatException e){
+            } catch (NumberFormatException e) {
                 resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -100,12 +100,12 @@ public class SongCreate extends HttpServlet {
         GenreEnum genre;
         try {
             genre = GenreEnum.valueOf(s_genre.toUpperCase());
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
-        if(song.getContentType()== null || !song.getContentType().startsWith("audio/") ||
-                (cover!=null && (cover.getContentType()==null || !cover.getContentType().startsWith("image/")))){
+        if (song.getContentType() == null || !song.getContentType().startsWith("audio/") ||
+                (cover != null && (cover.getContentType() == null || !cover.getContentType().startsWith("image/")))) {
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
@@ -114,16 +114,16 @@ public class SongCreate extends HttpServlet {
         Album album = null;
         Artist artist;
         try {
-            AlbumDAO albumDAO = new AlbumDAO(connection,filesDirectory);
-            if(a_ID_str==null) {
-                artist = new ArtistDAO(connection).getArtist(user.getUsername(),ar_name);
+            AlbumDAO albumDAO = new AlbumDAO(connection, filesDirectory);
+            if (a_ID_str == null) {
+                artist = new ArtistDAO(connection).getArtist(user.getUsername(), ar_name);
                 album = albumDAO.addAlbum(a_name, artist, a_date, cover, user.getUsername());
             } else {
-                album = albumDAO.getAlbum(user.getUsername(),a_ID);
+                album = albumDAO.getAlbum(user.getUsername(), a_ID);
             }
-            new SongDAO(connection,filesDirectory).addSong(user.getUsername(), s_title,genre, song, album);
+            new SongDAO(connection, filesDirectory).addSong(user.getUsername(), s_title, genre, song, album);
             connection.commit();
-        } catch (InvalidParameterException e){
+        } catch (InvalidParameterException e) {
             try {
                 connection.rollback();
             } catch (SQLException ex) {
@@ -131,11 +131,11 @@ public class SongCreate extends HttpServlet {
             }
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
-        } catch (SQLException e){
+        } catch (SQLException e) {
             try {
                 connection.rollback();
                 //cover deletion when song query or song file save fails
-                new AlbumDAO(connection,filesDirectory).deleteAlbumCover(user.getUsername(),album);
+                new AlbumDAO(connection, filesDirectory).deleteAlbumCover(user.getUsername(), album);
             } catch (SQLException ex) {
                 throw new RuntimeException(ex);
             }
@@ -143,6 +143,6 @@ public class SongCreate extends HttpServlet {
             return;
         }
         // success
-        resp.sendRedirect("home?a=false&s="+album.getId());
+        resp.sendRedirect("home?a=false&s=" + album.getId());
     }
 }
