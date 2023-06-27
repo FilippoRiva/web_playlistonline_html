@@ -23,8 +23,8 @@ public class PlaylistCreate extends HttpServlet {
     @Override
     public void init(){
         homeDispatcher = getServletContext().getRequestDispatcher("/home");
+        this.connection = MySQLConnections.getConnection(getServletContext());
         try {
-            this.connection = MySQLConnections.getConnection(getServletContext());
             connection.setAutoCommit(false);
         } catch (SQLException e) {
             throw new RuntimeException(e);

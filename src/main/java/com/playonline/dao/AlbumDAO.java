@@ -54,7 +54,7 @@ public class AlbumDAO {
             getAlbumByIDStatement.setInt(2,albumID);
             ResultSet result = getAlbumByIDStatement.executeQuery();
             if(!result.next()) {
-                throw new InvalidParameterException();
+                throw new InvalidParameterException(); //invalid user album couple
             }
             // java bean creation
             Album album = new Album();

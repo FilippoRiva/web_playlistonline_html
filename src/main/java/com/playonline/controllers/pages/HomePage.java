@@ -57,6 +57,7 @@ public class HomePage extends HttpServlet {
                 req.setAttribute("addingNewAlbum",addingNewAlbum);
             }
         }
+
         // keeping genre input
         String s_genre = req.getParameter("s_genre");
         int selectedId=0;
@@ -117,10 +118,5 @@ public class HomePage extends HttpServlet {
             req.setAttribute("addingNewAlbum", addingNewAlbum);
         }
         doGet(req,resp);
-    }
-
-    @Override
-    public void destroy() {
-        super.destroy();
     }
 }

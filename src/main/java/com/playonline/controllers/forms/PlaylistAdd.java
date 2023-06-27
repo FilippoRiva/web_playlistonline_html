@@ -22,6 +22,11 @@ public class PlaylistAdd extends HttpServlet {
     @Override
     public void init() throws ServletException {
         this.connection = MySQLConnections.getConnection(getServletContext());
+        try {
+            this.connection.setAutoCommit(false);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override
@@ -62,7 +67,13 @@ public class PlaylistAdd extends HttpServlet {
                 } catch (NumberFormatException ignored) { //ignoring non parsable IDs
                 }
             }
+            connection.commit();
         } catch (SQLException e) {
+            try{
+                connection.rollback();
+            } catch (SQLException ex){
+                throw new RuntimeException(ex);
+            }
             resp.sendError(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
